@@ -1,0 +1,42 @@
+{
+  "name": "penguin",
+  "version": "1.0.0",
+  "main": "build/penguin.js",
+  "type": "module",
+  "repository": "https://github.com/MangoPlex/Penguin",
+  "author": "Just Mango <38831897+JustMangoT@users.noreply.github.com>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.9.1"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "node --loader ts-node/esm src/penguin.ts",
+    "start": "nodemon --exec node --loader ts-node/esm src/penguin.ts",
+    "serve": "node build/penguin.js"
+  },
+  "dependencies": {
+    "@discordjs/builders": "^0.9.0",
+    "@discordjs/opus": "^0.7.0",
+    "@discordjs/rest": "^0.1.0-canary.0",
+    "@discordjs/voice": "^0.7.5",
+    "@discordx/importer": "^1.1.2",
+    "@discordx/music": "^3.0.16",
+    "@discordx/utilities": "^3.1.5",
+    "bufferutil": "^4.0.5",
+    "discord-api-types": "^0.25.2",
+    "discord.js": "^13.3.1",
+    "discordx": "^9.0.1",
+    "erlpack": "^0.1.3",
+    "reflect-metadata": "^0.1.13",
+    "utf-8-validate": "^5.0.7",
+    "zlib-sync": "^0.1.7"
+  },
+  "devDependencies": {
+    "@types/node": "^16.11.11",
+    "eslint": "^8.3.0",
+    "nodemon": "^2.0.15",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.2"
+  }
+}
