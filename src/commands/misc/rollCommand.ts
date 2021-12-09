@@ -3,7 +3,7 @@ import {CommandInteraction} from "discord.js";
 
 @Discord()
 export abstract class RollCommand {
-    @Slash("roll")
+    @Slash("roll", { description: "Roll a random number" })
     async roll(
         @SlashOption("max", {
             description: "The maximum number to roll",

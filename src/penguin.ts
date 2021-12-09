@@ -1,13 +1,18 @@
 import "reflect-metadata";
 import {Client} from "discordx";
 import {Intents} from "discord.js";
-import PenguinConstants from "./penguinConstants.js";
 import {dirname, importx} from "@discordx/importer";
+
 import * as util from "util";
 import * as os from "os";
 
+import PenguinConstants from "./penguinConstants.js";
+import MusicPlayer from "./common/music/musicPlayer.js";
+
 export default class Penguin extends Client{
-    static startTime = Date.now();
+    static _startTime = Date.now();
+
+    private static _musicPlayer = new MusicPlayer();
 
     constructor() {
         super({
@@ -33,18 +38,18 @@ export default class Penguin extends Client{
     }
 
     static async start(): Promise<void> {
-        console.log(`System Info:\n - OS: ${os.type()}\n - CPU: ${os.cpus()[0].model}\n - MEMORY: ${Math.floor(os.freemem() / 1024 / 1024 )}/${Math.floor(os.totalmem() / 1024 / 1024 )} MB`);
+        console.log(`System Info:\n - OS: ${os.type()}\n - CPU: ${os.cpus()[0].model}\n - MEMORY: ${Math.floor(os.totalmem() / 1024 / 1024 )} MB`);
         const client = new Penguin();
 
         console.log("Initializing...");
         await importx(dirname(import.meta.url) + "/{events,commands}/**/*.{ts,js}");
 
         await client.login(process.env.DISCORD_TOKEN ?? "ODI5NzI2MTU2MzI0MDc3NTg4.YG8Usw.Pktyh6X3a2fCeLV3IVSXdIrCQcw");
-        await client.clearApplicationCommands();
-        await client.clearApplicationCommands(PenguinConstants.GUILD_ID);
-        await client.initApplicationCommands();
-        await client.initApplicationPermissions();
+    }
+
+    static get musicPlayer(): MusicPlayer {
+        return Penguin._musicPlayer;
     }
 }
 
-Penguin.start().then(() => console.log(`Started! (${Date.now() - Penguin.startTime}ms)`));
+Penguin.start().then(() => console.log(`Started! (${Date.now() - Penguin._startTime}ms)`));

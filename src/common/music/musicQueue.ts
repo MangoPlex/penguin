@@ -10,10 +10,10 @@ import {
 import {Player, Queue} from "@discordx/music";
 import {Client} from "discordx";
 import {Pagination, PaginationResolver} from "@discordx/utilities";
+import TimeUtils from "../../util/timeUtils.js";
 
 export default class MusicQueue extends Queue {
     lastControlMessage?: Message;
-    timeoutTimer?: NodeJS.Timeout;
     lockUpdate = false;
 
     get playbackMilliseconds(): number {
@@ -26,7 +26,7 @@ export default class MusicQueue extends Queue {
             return 0;
         }
 
-        return this.toMS(track.metadata.info.duration);
+        return TimeUtils.toMS(track.metadata.info.duration);
     }
 
     constructor(
@@ -37,29 +37,6 @@ export default class MusicQueue extends Queue {
         super(player, guild);
         setInterval(() => this.updateControlMessage(), 1e4);
         // empty constructor
-    }
-
-    public fromMS(duration: number): string {
-        const seconds = Math.floor((duration / 1e3) % 60);
-        const minutes = Math.floor((duration / 6e4) % 60);
-        const hours = Math.floor(duration / 36e5);
-        const secondsPad = `${seconds}`.padStart(2, "0");
-        const minutesPad = `${minutes}`.padStart(2, "0");
-        const hoursPad = `${hours}`.padStart(2, "0");
-        return `${hours ? `${hoursPad}:` : ""}${minutesPad}:${secondsPad}`;
-    }
-
-    public toMS(duration: string): number {
-        const milliseconds =
-            duration
-                .split(":")
-                .reduceRight(
-                    (prev, curr, i, arr) =>
-                        prev + parseInt(curr) * Math.pow(60, arr.length - 1 - i),
-                    0
-                ) * 1e3;
-
-        return milliseconds ? milliseconds : 0;
     }
 
     private controlsRow(): MessageActionRow[] {
@@ -174,8 +151,8 @@ export default class MusicQueue extends Queue {
                 block.repeat(progress) + arrow + block.repeat(emptyProgress);
 
             const bar = (this.isPlaying ? "▶️" : "⏸️") + " " + progressString;
-            const currentTime = this.fromMS(timeNow);
-            const endTime = this.fromMS(timeTotal);
+            const currentTime = TimeUtils.fromMS(timeNow);
+            const endTime = TimeUtils.fromMS(timeTotal);
             const spacing = bar.length - currentTime.length - endTime.length;
             const time =
                 "`" + currentTime + " ".repeat(spacing * 3 - 2) + endTime + "`";

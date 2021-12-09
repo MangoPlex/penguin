@@ -1,72 +1,12 @@
-import {ArgsOf, ButtonComponent, Client, Discord, On, Slash, SlashGroup, SlashOption} from "discordx";
+import {ButtonComponent, Client, Discord, Slash, SlashGroup, SlashOption} from "discordx";
 import {CommandInteraction, Guild, GuildMember, MessageEmbed} from "discord.js";
-import MusicPlayer from "../../common/music/musicPlayer.js";
 import MusicQueue from "../../common/music/musicQueue.js";
+import Penguin from "../../penguin.js";
 
 @Discord()
 @SlashGroup("music")
-export default class musicCommand {
-    player;
-
-    constructor() {
-        this.player = new MusicPlayer();
-    }
-
-    @On("voiceStateUpdate")
-    voiceUpdate(
-        [oldState, newState]: ArgsOf<"voiceStateUpdate">,
-        client: Client
-    ): void {
-        const queue = this.player.getQueue(oldState.guild);
-
-        if (
-            !queue.isReady ||
-            !queue.voiceChannelId ||
-            (oldState.channelId != queue.voiceChannelId &&
-                newState.channelId != queue.voiceChannelId) ||
-            !queue.channel
-        ) {
-            return;
-        }
-
-        const channel =
-            oldState.channelId === queue.voiceChannelId
-                ? oldState.channel
-                : newState.channel;
-
-        if (!channel) {
-            return;
-        }
-
-        const totalMembers = channel.members.filter((m) => !m.user.bot);
-
-        if (queue.isPlaying && !totalMembers.size) {
-            queue.pause();
-            queue.channel.send(
-                "> To save resources, I have paused the queue since everyone has left my voice channel."
-            );
-
-            if (queue.timeoutTimer) {
-                clearTimeout(queue.timeoutTimer);
-            }
-
-            queue.timeoutTimer = setTimeout(() => {
-                queue.channel?.send(
-                    "> My voice channel has been open for 5 minutes and no one has joined, so the queue has been deleted."
-                );
-                queue.leave();
-            }, 5 * 60 * 1000);
-        } else if (queue.isPause && totalMembers.size) {
-            if (queue.timeoutTimer) {
-                clearTimeout(queue.timeoutTimer);
-                queue.timeoutTimer = undefined;
-            }
-            queue.resume();
-            queue.channel.send(
-                "> There has been a new participant in my voice channel, and the queue will be resumed. Enjoy the music 🎶"
-            );
-        }
-    }
+export default class MusicCommand {
+    player = Penguin.musicPlayer;
 
     validateControlInteraction(
         interaction: CommandInteraction,
@@ -426,17 +366,5 @@ export default class musicCommand {
             return;
         }
         interaction.reply("> current music seeked");
-    }
-
-    @Slash("leave", { description: "stop music" })
-    leave(interaction: CommandInteraction, client: Client): void {
-        const validate = this.validateInteraction(interaction, client);
-        if (!validate) {
-            return;
-        }
-
-        const { queue } = validate;
-        queue.leave();
-        interaction.reply("> stopped music");
     }
 }
