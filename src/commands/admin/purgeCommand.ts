@@ -20,16 +20,12 @@ export default class PurgeCommand {
     // @Slash() - Unable to use now
     async purge(
         @SlashOption("amount", {
-            description: "The maximum number to roll",
+            description: "The maximum number to purge",
             required: true
         }) amount: number,
 
         interaction: CommandInteraction
     ) {
-        if (!(interaction.channel instanceof TextChannel)) {
-            return MessageUtils.replyWithErrorEmbed(interaction, "You must be in Server channel to do this", true);
-        }
-
         if (amount < 1 || amount > 100) {
             return MessageUtils.replyWithErrorEmbed(interaction, "The amount must be between 1 and 100", true);
         }
@@ -51,22 +47,17 @@ export default class PurgeCommand {
 
     @ButtonComponent("purge-cancel-btn")
     async handleCancelButton(interaction: ButtonInteraction) {
-        /*
         await interaction.deferReply();
         await interaction.deleteReply();
         await this._interaction?.deleteReply();
-        */
     }
 
     @ButtonComponent("purge-accept-btn")
     async handleAcceptButton(interaction: ButtonInteraction) {
-        /*
         await interaction.deferReply();
         await interaction.deleteReply();
 
-
         const channel = interaction.channel as TextChannel;
         await channel.bulkDelete(await channel.messages.fetch({limit: this._amount}));
-        */
     }
 }
