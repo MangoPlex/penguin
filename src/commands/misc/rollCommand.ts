@@ -13,7 +13,10 @@ export abstract class RollCommand {
         interaction: CommandInteraction
     ) {
         if (max < 1) {
-            await interaction.reply("The maximum number must be greater than 0");
+            await interaction.reply({
+                content: "The maximum number must be greater than 0",
+                ephemeral: true
+            });
         } else await interaction.reply(`You rolled a ${Math.floor(Math.random() * max) + 1}`);
     }
 }

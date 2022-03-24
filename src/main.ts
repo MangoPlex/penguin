@@ -22,15 +22,17 @@ export const client = new Client({
         Intents.FLAGS.GUILD_MEMBERS,
         Intents.FLAGS.GUILD_MESSAGES,
         Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+        Intents.FLAGS.GUILD_VOICE_STATES
     ],
 
     // Discord.ts (Discordx)
     botGuilds: [(client) => client.guilds.cache.map((guild) => guild.id)],
+
 })
 
 console.log("Initializing...");
 
 await importx(dirname(import.meta.url) + "/{listeners,commands}/**/*.{ts,js}");
-await client.login(process.env.DISCORD_TOKEN!);
-
+//await client.login(process.env.DISCORD_TOKEN!);
+await client.login("ODI5NzI2MTU2MzI0MDc3NTg4.YG8Usw.RXu3mIJXzTYG1WwpAthuH9EicrQ")
 console.log(`Started! (${Date.now() - startTime}ms)`)

@@ -1,8 +1,9 @@
-import { MessageEmbed, TextChannel } from "discord.js";
+import { MessageEmbed, TextChannel, VoiceChannel } from "discord.js";
 import {Client, Discord, Once} from "discordx";
 import TimeUtils from "../../util/timeUtils.js";
 
 import CryptoHelper from "../../common/cryptoHelper.js";
+import VoiceStateUpdateListener from "../voice/voiceStateUpdateListener.js";
 
 @Discord()
 export default class ReadyListener {
@@ -17,7 +18,8 @@ export default class ReadyListener {
         });
         await client.initApplicationPermissions();
 
-        this.cryptoTracking(client);
+        this.purgeTempVoiceChannels(client);
+        // this.cryptoTracking(client);
 
         setInterval(() => {
             client.user!.setActivity(
@@ -31,7 +33,19 @@ export default class ReadyListener {
 
     }
 
-    private cryptoTracking(client: Client) {
+    private async purgeTempVoiceChannels(client: Client) {
+        (await client.channels.cache.filter(channel => channel.isVoice())).forEach(channel => {
+            channel = channel as VoiceChannel
+            if (channel.name.includes("'s lounge")) {
+                if (channel.members.size == 0)
+                    channel.delete();
+                else VoiceStateUpdateListener.TEMP_CHANNELS.push(channel);
+            }
+                
+        })
+    }
+
+    private async cryptoTracking(client: Client) {
         setInterval(async () => {
             // HARDCODED
             const channel: TextChannel = await client.channels.fetch("934320425217957928")! as TextChannel;
