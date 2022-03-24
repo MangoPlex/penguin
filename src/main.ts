@@ -33,6 +33,5 @@ export const client = new Client({
 console.log("Initializing...");
 
 await importx(dirname(import.meta.url) + "/{listeners,commands}/**/*.{ts,js}");
-//await client.login(process.env.DISCORD_TOKEN!);
-await client.login("ODI5NzI2MTU2MzI0MDc3NTg4.YG8Usw.RXu3mIJXzTYG1WwpAthuH9EicrQ")
+await client.login(process.env.DISCORD_TOKEN!);
 console.log(`Started! (${Date.now() - startTime}ms)`)

@@ -39,9 +39,8 @@ export default class ReadyListener {
             if (channel.name.includes("'s lounge")) {
                 if (channel.members.size == 0)
                     channel.delete();
-                else VoiceStateUpdateListener.TEMP_CHANNELS.push(channel);
+                else VoiceStateUpdateListener.TEMP_CHANNELS.push(channel.id);
             }
-                
         })
     }
 
