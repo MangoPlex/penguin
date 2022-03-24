@@ -3,14 +3,9 @@ import {Client} from "discordx";
 import {Intents} from "discord.js";
 import {dirname, importx} from "@discordx/importer";
 
-import * as dotenv from "dotenv";
 import * as util from "util";
 
 const startTime = Date.now();
-
-if (process.env.NODE_ENV !== "production") {
-    dotenv.config();
-}
 
 // Replace log
 const origLog = console.log;

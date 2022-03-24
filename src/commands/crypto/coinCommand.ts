@@ -22,6 +22,7 @@ export abstract class CoinCommand {
         else if (coin === "eth") coin = "ethereum";
         else if (coin === "mana") coin = "decentraland";
         else if (coin === "doge") coin = "dogecoin";
+        else if (coin === "matic") coin = "polygon";
 
         await interaction.deferReply();
 
