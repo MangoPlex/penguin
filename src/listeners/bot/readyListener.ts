@@ -4,6 +4,7 @@ import TimeUtils from "../../util/timeUtils.js";
 
 import CryptoHelper from "../../common/cryptoHelper.js";
 import VoiceStateUpdateListener from "../voice/voiceStateUpdateListener.js";
+import Settings from "../../settings.js";
 
 @Discord()
 export default class ReadyListener {
@@ -36,7 +37,7 @@ export default class ReadyListener {
     private async purgeTempVoiceChannels(client: Client) {
         (await client.channels.cache.filter(channel => channel.isVoice())).forEach(channel => {
             channel = channel as VoiceChannel
-            if (channel.name.includes("'s lounge")) {
+            if (Settings.VOICE_NAME_REGEX.test(channel.name)) {
                 if (channel.members.size == 0)
                     channel.delete();
                 else VoiceStateUpdateListener.TEMP_CHANNELS.push(channel.id);

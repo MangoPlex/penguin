@@ -21,9 +21,7 @@ export default class VoiceStateUpdateListener {
         if (voiceChannelLeft || voiceChannelMoved) {
             if (VoiceStateUpdateListener.TEMP_CHANNELS.some(channelId => channelId == oldState.channelId)) {
                 if (oldState.channel!!.members.size === 0) {
-                    oldState.channel!!.delete().then(() => {
-                        VoiceStateUpdateListener.TEMP_CHANNELS = VoiceStateUpdateListener.TEMP_CHANNELS.filter(channelId => channelId != oldState.channelId)
-                    });
+                    oldState.channel!!.delete().then(() => VoiceStateUpdateListener.TEMP_CHANNELS = VoiceStateUpdateListener.TEMP_CHANNELS.filter(channelId => channelId != oldState.channelId));
                 }
             }
         }
@@ -31,11 +29,17 @@ export default class VoiceStateUpdateListener {
         if (voiceChannelJoined || voiceChannelMoved) {
             if (Settings.VOICE_PARENTS.includes(newState.channelId!!)) {
                 const channel = await newState.guild.channels.create(
-                    `#${VoiceStateUpdateListener.TEMP_CHANNELS.length + 1} | ${newState.member?.user.username}'s lounge`,
+                    Settings.VOICE_NAME(VoiceStateUpdateListener.TEMP_CHANNELS.length + 1, newState.member?.user.username!!),
                     {
+                        type: "GUILD_VOICE",
                         parent: newState.channel?.parentId!!,
                         bitrate: newState.channel?.bitrate,
-                        type: "GUILD_VOICE"
+                        permissionOverwrites: [
+                            {
+                                id: newState.member!!.id,
+                                allow: [ "MANAGE_CHANNELS" ]
+                            }
+                        ]
                     }
                 );
                 channel.setRTCRegion(newState.channel?.rtcRegion!!)
