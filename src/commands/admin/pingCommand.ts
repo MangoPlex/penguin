@@ -3,6 +3,8 @@ import { Category, Description } from "@discordx/utilities";
 import { CommandInteraction, MessageEmbed } from "discord.js";
 import { exec } from "child_process";
 
+import OsUtils from "../../util/osUtils.js";
+
 @Discord()
 @Category("Admin Commands")
 export abstract class PingCommand {
@@ -20,7 +22,7 @@ export abstract class PingCommand {
         await interaction.deferReply();
 
         if (ip) {
-            exec(`ping -n 4 ${ip}`, async (error, stdout, stderr) => {
+            exec(OsUtils.isLinux() ? `ping -c 4 ${ip}` : `ping -n 4 ${ip}`, async (error, stdout, stderr) => {
                 await interaction.editReply("```" + stdout + "```")
             })
         } else {
