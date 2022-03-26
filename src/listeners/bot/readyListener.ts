@@ -34,9 +34,11 @@ export default class ReadyListener {
 
     }
 
+    
     private async purgeTempVoiceChannels(client: Client) {
         (await client.channels.cache.filter(channel => channel.isVoice())).forEach(channel => {
-            channel = channel as VoiceChannel
+            channel = channel as VoiceChannel;
+            // temporary way to handle temporary voicechat 
             if (Settings.VOICE_NAME_REGEX.test(channel.name)) {
                 if (channel.members.size == 0)
                     channel.delete();

@@ -17,6 +17,13 @@ export abstract class RollCommand {
                 content: "The maximum number must be greater than 0",
                 ephemeral: true
             });
-        } else await interaction.reply(`You rolled a ${Math.floor(Math.random() * max) + 1}`);
+        } else {
+            let roll = Math.floor(Math.random() * max) + 1;
+
+            if (roll === 727) {
+                await interaction.reply(`You rolled a 727, this is your rewards: https://www.youtube.com/watch?v=dQw4w9WgXcQ`);
+            }
+            await interaction.reply(`You rolled a ${roll}`);
+        } 
     }
 }
