@@ -1,5 +1,5 @@
 import type { ArgsOf } from "discordx";
-import {Client, Discord, On} from "discordx";
+import { Client, Discord, On } from "discordx";
 
 @Discord()
 export default class InteractionListeners {

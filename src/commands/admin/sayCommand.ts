@@ -1,9 +1,15 @@
-import {Discord, Slash, SlashOption} from "discordx";
-import {CommandInteraction, MessageEmbed} from "discord.js";
+import { Discord, Permission, Slash, SlashOption } from "discordx";
+import { Category, Description } from "@discordx/utilities";
+import { CommandInteraction, MessageEmbed } from "discord.js";
+
+import Settings from "../../settings";
 
 @Discord()
+@Category("Admin Commands")
 export abstract class SayCommand {
-    @Slash("say", { description: "Say" })
+    @Slash("say")
+    @Description("Say something as bot")
+    @Permission({ id: Settings.ADMIN_ROLE_ID, type: "ROLE", permission: true })
     async say(
         @SlashOption("text", {
             description: "text",

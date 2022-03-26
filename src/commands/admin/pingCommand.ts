@@ -1,10 +1,14 @@
-import {Discord, Slash, SlashOption} from "discordx";
-import {CommandInteraction, MessageEmbed} from "discord.js";
+import { Discord, Permission, Slash, SlashOption } from "discordx";
+import { Category, Description } from "@discordx/utilities";
+import { CommandInteraction, MessageEmbed } from "discord.js";
 import { exec } from "child_process";
 
 @Discord()
+@Category("Admin Commands")
 export abstract class PingCommand {
-    @Slash("ping", { description: "Ping a domain or ip" })
+    @Slash("ping")
+    @Description("Ping a domain or ip")
+    @Permission({ id: "920654387859296286", type: "ROLE", permission: true })
     async say(
         @SlashOption("ip", {
             description: "Provide an ip or domain",

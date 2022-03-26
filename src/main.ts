@@ -1,7 +1,7 @@
 import "reflect-metadata";
-import {Client} from "discordx";
-import {Intents} from "discord.js";
-import {dirname, importx} from "@discordx/importer";
+import { Client } from "discordx";
+import { dirname, importx } from "@discordx/importer";
+import { Intents } from "discord.js";
 
 import * as dotenv from "dotenv";
 import * as util from "util";

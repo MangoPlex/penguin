@@ -1,9 +1,12 @@
-import {Discord, Slash, SlashOption} from "discordx";
-import {CommandInteraction} from "discord.js";
+import { Discord, Slash, SlashOption } from "discordx";
+import { Category, Description } from "@discordx/utilities";
+import { CommandInteraction } from "discord.js";
 
 @Discord()
+@Category("Misc Commands")
 export abstract class RollCommand {
-    @Slash("roll", { description: "Roll a random number" })
+    @Slash("roll")
+    @Description("Roll a random number")
     async roll(
         @SlashOption("max", {
             description: "The maximum number to roll",
@@ -24,6 +27,6 @@ export abstract class RollCommand {
                 await interaction.reply(`You rolled a 727, this is your rewards: https://www.youtube.com/watch?v=dQw4w9WgXcQ`);
             }
             await interaction.reply(`You rolled a ${roll}`);
-        } 
+        }
     }
 }

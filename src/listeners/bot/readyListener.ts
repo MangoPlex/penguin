@@ -1,7 +1,7 @@
 import { MessageEmbed, TextChannel, VoiceChannel } from "discord.js";
-import {Client, Discord, Once} from "discordx";
-import TimeUtils from "../../util/timeUtils.js";
+import { Client, Discord, Once } from "discordx";
 
+import TimeUtils from "../../util/timeUtils.js";
 import CryptoHelper from "../../common/cryptoHelper.js";
 import VoiceStateUpdateListener from "../voice/voiceStateUpdateListener.js";
 import Settings from "../../settings.js";
@@ -9,7 +9,7 @@ import Settings from "../../settings.js";
 @Discord()
 export default class ReadyListener {
     @Once("ready")
-    async onReady({}, client: Client) {
+    async onReady({ }, client: Client) {
         console.log("Initialized and logged in as " + client.user!.tag);
         console.log("Starting...");
 
@@ -24,7 +24,7 @@ export default class ReadyListener {
 
         setInterval(() => {
             client.user!.setActivity(
-                `Uptime: ${ TimeUtils.fromStoDHM(process.uptime()) }`,
+                `Uptime: ${TimeUtils.fromStoDHM(process.uptime())}`,
                 { type: "WATCHING" }
             );
         }, 6e4);
@@ -34,7 +34,7 @@ export default class ReadyListener {
 
     }
 
-    
+
     private async purgeTempVoiceChannels(client: Client) {
         (await client.channels.cache.filter(channel => channel.isVoice())).forEach(channel => {
             channel = channel as VoiceChannel;
@@ -72,8 +72,8 @@ export default class ReadyListener {
                         DOGE: ${doge.usd} (${doge.vnd})
                         MANA: ${mana.usd} (${mana.vnd})
                     `, true)
-                    .setFooter("Update every 5 mins")
-                    .setTimestamp()
+                        .setFooter("Update every 5 mins")
+                        .setTimestamp()
                 ]
             });
         }, 300000);
