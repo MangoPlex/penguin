@@ -2,7 +2,7 @@ import { Discord, Permission, Slash, SlashOption } from "discordx";
 import { Category, Description } from "@discordx/utilities";
 import { CommandInteraction, MessageEmbed } from "discord.js";
 
-import Settings from "../../settings";
+import Settings from "../../settings.js";
 
 @Discord()
 @Category("Admin Commands")
