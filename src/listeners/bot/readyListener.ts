@@ -20,7 +20,6 @@ export default class ReadyListener {
         await client.initApplicationPermissions();
 
         this.purgeTempVoiceChannels(client);
-        this.fetchAlimeGirlPics(client);
         // this.cryptoTracking(client);
 
         setInterval(() => {
@@ -30,11 +29,6 @@ export default class ReadyListener {
             );
         }, 6e4);
     }
-
-    fetchAlimeGirlPics(client: Client) {
-
-    }
-
 
     private async purgeTempVoiceChannels(client: Client) {
         (await client.channels.cache.filter(channel => channel.isVoice())).forEach(channel => {

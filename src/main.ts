@@ -36,7 +36,8 @@ export const client = new Client({
 })
 
 console.log("Initializing...");
-
+console.log("Importing command/listener classes...");
 await importx(dirname(import.meta.url) + "/{listeners,commands}/**/*.{ts,js}");
+console.log("Imported")
 await client.login(process.env.DISCORD_TOKEN!);
 console.log(`Started! (${Date.now() - startTime}ms)`)
