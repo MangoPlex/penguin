@@ -20,17 +20,18 @@ export default class ReadyListener {
         await client.initApplicationPermissions();
 
         this.purgeTempVoiceChannels(client);
+        this.fetchAlimeGirlPics(client);
         // this.cryptoTracking(client);
 
         setInterval(() => {
             client.user!.setActivity(
-                `Uptime: ${TimeUtils.fromStoDHM(process.uptime())}`,
+                `Uptime: ${TimeUtils.fromMStoDHM(process.uptime() * 1000)}`,
                 { type: "WATCHING" }
             );
         }, 6e4);
     }
 
-    fetchAlimeGirlPics() {
+    fetchAlimeGirlPics(client: Client) {
 
     }
 

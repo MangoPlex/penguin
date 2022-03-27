@@ -22,7 +22,7 @@ export abstract class PingCommand {
         await interaction.deferReply();
 
         if (ip) {
-            exec(OsUtils.isLinux() ? `ping -c 4 ${ip}` : `ping -n 4 ${ip}`, async (error, stdout, stderr) => {
+            exec(OsUtils.isLinux() ? `ping -c 4 ${ip}` : `ping -n 4 -t 128 ${ip}`, async (error, stdout, stderr) => {
                 await interaction.editReply("```" + stdout + "```")
             })
         } else {

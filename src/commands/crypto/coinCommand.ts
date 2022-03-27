@@ -1,13 +1,14 @@
 import {Discord, Slash, SlashOption} from "discordx";
 import {CommandInteraction, MessageEmbed} from "discord.js";
-import { Category } from "@discordx/utilities";
+import { Category, Description } from "@discordx/utilities";
 
 import CryptoHelper from "../../common/cryptoHelper.js";
 
 @Discord()
 @Category("Crypto Commands")
 export abstract class CoinCommand {
-    @Slash("coin", { description: "Get price of the cryptocurrency" })
+    @Slash("coin")
+    @Description("Get price of the cryptocurrency")
     async coin(
         @SlashOption("coin", {
             description: "The coin's name",

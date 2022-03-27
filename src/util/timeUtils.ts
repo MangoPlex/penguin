@@ -6,13 +6,6 @@ export default class TimeUtils {
         return `${d}d ${h}h ${m}m`;
     }
 
-    public static fromStoDHM(sto: number): string {
-        const d = Math.floor(sto / 86400);
-        const h = Math.floor((sto % 86400) / 3600);
-        const m = Math.floor((sto % 3600) / 60);
-        return `${d}d ${h}h ${m}m`;
-    }
-
     public static fromMS(duration: number): string {
         const seconds = Math.floor((duration / 1e3) % 60);
         const minutes = Math.floor((duration / 6e4) % 60);
