@@ -41,36 +41,4 @@ export default class ReadyListener {
             }
         })
     }
-
-    private async cryptoTracking(client: Client) {
-        setInterval(async () => {
-            // HARDCODED
-            const channel: TextChannel = await client.channels.fetch("934320425217957928")! as TextChannel;
-            const message = await channel?.messages.fetch("934329984154230804");
-            // HARDCODED
-
-            const btc = await CryptoHelper.getCryptoPrice("bitcoin");
-            const eth = await CryptoHelper.getCryptoPrice("ethereum");
-            const doge = await CryptoHelper.getCryptoPrice("dogecoin");
-            const mana = await CryptoHelper.getCryptoPrice("decentraland");
-
-            message.edit({
-                embeds: [
-                    new MessageEmbed()
-                        .setAuthor("Crypto tracking", "https://theme.zdassets.com/theme_assets/2186968/011d864ead44b8190c81a319a6caff00345e04de.png", "https://coinmarketcap.com/")
-                        .setColor("YELLOW")
-                        .addField("**CRYPTOS:**", `
-                        BTC: ${btc.usd} (${btc.vnd})
-                        ETH: ${eth.usd} (${eth.vnd}) 
-                    `, true)
-                        .addField("**TOKENS:**", `
-                        DOGE: ${doge.usd} (${doge.vnd})
-                        MANA: ${mana.usd} (${mana.vnd})
-                    `, true)
-                        .setFooter("Update every 5 mins")
-                        .setTimestamp()
-                ]
-            });
-        }, 300000);
-    }
 }

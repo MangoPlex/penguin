@@ -9,7 +9,7 @@ export abstract class AvatarCommand {
     @Description("See user avatar")
     async roll(
         @SlashOption("user", {
-            description: "The user to get the avatar of",
+            description: "The user to get the avatar",
             required: false
         }) user: User,
 
@@ -20,9 +20,10 @@ export abstract class AvatarCommand {
         }
 
         await interaction.reply({
-            embeds: [ new MessageEmbed()
-                .setTitle(`${user.username}'s avatar`)
-                .setImage(user.displayAvatarURL({ size: 512, dynamic: true }))
+            embeds: [ 
+                new MessageEmbed()
+                    .setTitle(`${(await interaction.client.users.fetch(user)).username}'s avatar`)
+                    .setImage(user.displayAvatarURL({ size: 512, dynamic: true }))
              ]
         });
     }
