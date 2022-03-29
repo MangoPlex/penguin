@@ -1,18 +1,21 @@
 {
     "compilerOptions": {
-        "module": "ESNext",
         "target": "ESNext",
-        "noImplicitAny": true,
-        "sourceMap": true,
-        "strict": true,
+        "module": "ESNext",
         "outDir": "build",
-        "emitDecoratorMetadata": true,
-        "experimentalDecorators": true,
-        "declaration": false,
-        "importHelpers": true,
-        "forceConsistentCasingInFileNames": true,
+        "rootDir": "src",
+        "strict": true,
+        "esModuleInterop": true,
         "moduleResolution": "Node",
-        "esModuleInterop": true
+        /* Experimental Options */
+        "experimentalDecorators": true /* Enables experimental support for ES7 decorators. */,
+        "emitDecoratorMetadata": true /* Enables experimental support for emitting type metadata for decorators. */,
+        /* Advanced Options */
+        "skipLibCheck": false,
+        "forceConsistentCasingInFileNames": true
     },
-    "exclude": ["node_modules"]
+    "exclude": [
+        "build",
+        "node_modules"
+    ]
 }
