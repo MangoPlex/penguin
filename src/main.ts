@@ -12,14 +12,6 @@ if (process.env.NODE_ENV !== "production") {
 
 const startTime = Date.now();
 
-// Replace log
-const origLog = console.log;
-console.log = function () {
-    const strDate = `[${new Date().toLocaleString()}] `;
-    const logString = strDate + util.format.apply(util.format, Array.prototype.slice.call(arguments));
-    origLog(logString);
-};
-
 export const client = new Client({
     // Discord.js
     intents: [
