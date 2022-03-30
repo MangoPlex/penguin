@@ -4,7 +4,6 @@ import { dirname, importx } from "@discordx/importer";
 import { Intents } from "discord.js";
 
 import * as dotenv from "dotenv";
-import * as util from "util";
 
 if (process.env.NODE_ENV !== "production") {
     dotenv.config();
