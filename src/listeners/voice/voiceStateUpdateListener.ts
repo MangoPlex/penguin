@@ -12,6 +12,7 @@ export default class VoiceStateUpdateListener {
     async onVoiceStateUpdate([oldState, newState]: ArgsOf<"voiceStateUpdate">, client: Client) {
         console.log("Voice state changed!")
         if (process.env.NODE_ENV === "production") {
+            console.log("Voice state changed! 2")
             this.handleTempVoiceChannels(oldState, newState);
         }
     }
@@ -22,6 +23,7 @@ export default class VoiceStateUpdateListener {
         const voiceChannelJoined = !oldState.channelId && !!newState.channelId;
 
         if (voiceChannelLeft || voiceChannelMoved) {
+            console.log("Voice state left!")
             if (VoiceStateUpdateListener.TEMP_CHANNELS.some(channelId => channelId == oldState.channelId)) {
                 if (oldState.channel!!.members.size === 0) {
                     oldState.channel!!.delete().then(() => VoiceStateUpdateListener.TEMP_CHANNELS = VoiceStateUpdateListener.TEMP_CHANNELS.filter(channelId => channelId != oldState.channelId));
@@ -30,6 +32,7 @@ export default class VoiceStateUpdateListener {
         }
 
         if (voiceChannelJoined || voiceChannelMoved) {
+            console.log("Voice state joined!")
             if (Settings.VOICE_PARENTS.includes(newState.channelId!!)) {
                 const channel = await newState.guild.channels.create(
                     Settings.VOICE_NAME(VoiceStateUpdateListener.TEMP_CHANNELS.length + 1, newState.member?.user.username!!),
