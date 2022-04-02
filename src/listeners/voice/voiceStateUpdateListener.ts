@@ -10,9 +10,7 @@ export default class VoiceStateUpdateListener {
 
     @On("voiceStateUpdate")
     async onVoiceStateUpdate([oldState, newState]: ArgsOf<"voiceStateUpdate">, client: Client) {
-        if (process.env.NODE_ENV === "production") {
-            this.handleTempVoiceChannels(oldState, newState);
-        }
+        this.handleTempVoiceChannels(oldState, newState);
     }
 
     private async handleTempVoiceChannels(oldState: VoiceState, newState: VoiceState) {
