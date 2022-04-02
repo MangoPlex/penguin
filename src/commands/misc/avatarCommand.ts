@@ -7,7 +7,7 @@ import { CommandInteraction, MessageEmbed, User } from "discord.js";
 export abstract class AvatarCommand {
     @Slash("avatar")
     @Description("See user avatar")
-    async roll(
+    async avatar(
         @SlashOption("user", {
             description: "The user to get the avatar",
             required: false
