@@ -19,7 +19,6 @@ export default class VoiceStateUpdateListener {
         const voiceChannelJoined = !oldState.channelId && !!newState.channelId;
 
         if (voiceChannelLeft || voiceChannelMoved) {
-            console.log("Voice state left!")
             if (VoiceStateUpdateListener.TEMP_CHANNELS.some(channelId => channelId == oldState.channelId)) {
                 if (oldState.channel!!.members.size === 0) {
                     oldState.channel!!.delete().then(() => VoiceStateUpdateListener.TEMP_CHANNELS = VoiceStateUpdateListener.TEMP_CHANNELS.filter(channelId => channelId != oldState.channelId));
@@ -28,23 +27,18 @@ export default class VoiceStateUpdateListener {
         }
 
         if (voiceChannelJoined || voiceChannelMoved) {
-            console.log("Voice state joined!")
             if (Settings.VOICE_PARENTS.includes(newState.channelId!!)) {
                 const channel = await newState.guild.channels.create(
-                    Settings.VOICE_NAME(VoiceStateUpdateListener.TEMP_CHANNELS.length + 1, newState.member?.user.username!!),
+                    Settings.VOICE_NAME(newState.member?.user.username!!),
                     {
                         type: "GUILD_VOICE",
                         parent: newState.channel?.parentId!!,
                         bitrate: newState.channel?.bitrate,
-                        permissionOverwrites: [
-                            {
-                                id: newState.member!!.id,
-                                allow: [ "MANAGE_CHANNELS" ]
-                            }
-                        ]
                     }
                 );
-                channel.setRTCRegion(newState.channel?.rtcRegion!!)
+
+                channel.lockPermissions();
+                channel.setRTCRegion(newState.channel?.rtcRegion!!);
                 newState.setChannel(channel);
 
                 VoiceStateUpdateListener.TEMP_CHANNELS.push(channel.id)
