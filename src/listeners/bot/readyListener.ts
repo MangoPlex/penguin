@@ -1,10 +1,7 @@
-import { MessageEmbed, TextChannel, VoiceChannel } from "discord.js";
 import { Client, Discord, Once } from "discordx";
 
 import TimeUtils from "../../util/timeUtils.js";
-import CryptoHelper from "../../common/cryptoHelper.js";
-import VoiceStateUpdateListener from "../voice/voiceStateUpdateListener.js";
-import Settings from "../../settings.js";
+import MusicUtils from "../../util/musicUtils.js";
 
 @Discord()
 export default class ReadyListener {
@@ -25,5 +22,11 @@ export default class ReadyListener {
                 { type: "WATCHING" }
             );
         }, 6e4);
+
+        client.lavalink = new MusicUtils(client);
+
+        // Workaround because discordx does not support custom emitter
+        client.ws.on("VOICE_SERVER_UPDATE", (data: any) => client.lavalink?.handleVoiceUpdate(data));
+        client.ws.on("VOICE_STATE_UPDATE", (data: any) => client.lavalink?.handleVoiceUpdate(data));
     }
 }
