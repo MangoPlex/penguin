@@ -1,6 +1,6 @@
 import { Description } from "@discordx/utilities";
 import { Song } from "@lavaclient/queue";
-import { ButtonInteraction, CommandInteraction, MessageActionRow, MessageButton, MessageComponent, MessageEmbed } from "discord.js";
+import { ButtonInteraction, CommandInteraction, MessageActionRow, MessageButton, MessageEmbed } from "discord.js";
 import { ButtonComponent, Discord, Slash, SlashOption } from "discordx";
 
 @Discord()
@@ -51,7 +51,7 @@ export default class QueueCommand {
             .setFooter({ text: "This list might be incorrect, please use this command again to update the queue" });
         selected.map((song: Song) => {
             embed.addField(
-                `${this._origQ.indexOf(song)} ${song.title}`,
+                `${this._origQ.indexOf(song) + 1} ${song.title}`,
                 `Requested by: ${song.requester}`,
                 false
             );
@@ -86,17 +86,20 @@ export default class QueueCommand {
             new MessageButton()
                 .setCustomId("queue-next-page")
                 .setLabel("➡️")
-                .setDisabled(this._page === this._divdQ.length - 1),
+                .setDisabled(this._page === this._divdQ.length - 1)
+                .setStyle("PRIMARY"),
             new MessageButton()
                 .setCustomId("queue-prev-page")
                 .setLabel("⬅️")
-                .setDisabled(this._page === 0),
+                .setDisabled(this._page === 0)
+                .setStyle("PRIMARY"),
             new MessageButton()
                 .setCustomId("queue-close-page")
                 .setLabel("❌")
+                .setStyle("DANGER")
         );
 
-        await interaction.editReply({
+        await interaction.reply({
             embeds: [embed],
             components: [row]
         });
