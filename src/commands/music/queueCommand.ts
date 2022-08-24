@@ -21,7 +21,7 @@ export default class QueueCommand {
         interaction: CommandInteraction
     ): Promise<void> {
         this._page = page;
-        const player = interaction.client.lavalink?.getPlayer(interaction.guildId as string);
+        const player = interaction.client.lavalink?.getPlayer(interaction.guildId!);
         if (!player || (player.queue && player.queue.tracks.length === 0)) {
             return await interaction.reply({
                 embeds: [
