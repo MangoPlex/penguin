@@ -59,7 +59,7 @@ export default class PlayCommand {
             case "SEARCH_RESULT":
             case "TRACK_LOADED":
                 const track = res.tracks[0];
-                player?.queue.add(track);
+                player?.queue.add(track, { requester: interaction.user.tag });
                 await interaction.reply({
                     embeds: [
                         new MessageEmbed()
@@ -68,7 +68,7 @@ export default class PlayCommand {
                 });
                 break;
             case "PLAYLIST_LOADED":
-                player?.queue.add(res.tracks);
+                player?.queue.add(res.tracks, { requester: interaction.user.tag });
                 await interaction.reply({
                     embeds: [
                         new MessageEmbed()
