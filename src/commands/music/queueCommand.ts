@@ -96,6 +96,7 @@ export default class QueueCommand {
             new MessageButton()
                 .setCustomId("queue-close-page")
                 .setLabel("❌")
+                .setDisabled(true)
                 .setStyle("DANGER")
         );
 
