@@ -10,12 +10,24 @@ export default class VoiceStateUpdateListener {
 
     @On("voiceStateUpdate")
     async onVoiceStateUpdate([oldState, newState]: ArgsOf<"voiceStateUpdate">, client: Client) {
+        if (oldState.channel && !newState.channel) {
+            if (oldState.member?.user.id === oldState.client.user?.id) {
+                await oldState.client.lavalink?.destroyPlayer(newState.guild.id);
+            } else if (oldState.channel.members.get(client.user?.id as string)) {
+                if (
+                    oldState.channel.members.filter(
+                        m => !m.user.bot
+                    ).size === 0
+                )
+                    await oldState.guild.me?.voice.disconnect("No members left");
+            }
+        }
         this.handleTempVoiceChannels(oldState, newState);
     }
 
     private async handleTempVoiceChannels(oldState: VoiceState, newState: VoiceState) {
-        const voiceChannelLeft   = !!oldState.channelId && !newState.channelId;
-        const voiceChannelMoved  = !!oldState.channelId && !!newState.channelId && oldState.channelId !== newState.channelId;
+        const voiceChannelLeft = !!oldState.channelId && !newState.channelId;
+        const voiceChannelMoved = !!oldState.channelId && !!newState.channelId && oldState.channelId !== newState.channelId;
         const voiceChannelJoined = !oldState.channelId && !!newState.channelId;
 
         if (voiceChannelLeft || voiceChannelMoved) {
