@@ -14,7 +14,9 @@ export default class ReadyListener {
             guild: { log: true },
             global: { log: false },
         });
-        await client.initApplicationPermissions();
+        // Removed bc bots cannot control permission anymore
+        // see: https://discord.com/developers/docs/topics/permissions
+        // await client.initApplicationPermissions();
 
         setInterval(() => {
             client.user!.setActivity(

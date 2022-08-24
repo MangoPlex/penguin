@@ -15,28 +15,34 @@ export default class PlayCommand {
         url: string,
         interaction: CommandInteraction
     ): Promise<void> {
+        await interaction.deferReply();
         const botState = interaction.guild?.me?.voice;
         const member = await interaction.guild?.members.fetch(interaction.user.id);
         const memberState = member?.voice;
         const lavalink = interaction.client.lavalink;
 
-        if (!memberState?.channelId)
-            return await interaction.reply({
+        if (!memberState?.channelId) {
+            await interaction.editReply({
                 embeds: [
                     new MessageEmbed()
                         .setDescription("Please join a voice channel first")
                 ]
             });
+            return;
+        }
+        
+
 
         let player;
 
         if (botState?.channelId && player) {
-            return await interaction.reply({
+            await interaction.editReply({
                 embeds: [
                     new MessageEmbed()
                         .setDescription("The bot is busy at another channel")
                 ]
             });
+            return;
         }
 
         if (botState?.channelId && !player)
@@ -59,8 +65,8 @@ export default class PlayCommand {
             case "SEARCH_RESULT":
             case "TRACK_LOADED":
                 const track = res.tracks[0];
-                player?.queue.add(track, { requester: interaction.user.tag });
-                await interaction.reply({
+                player?.queue.add(track, { requester: interaction.user.id });
+                await interaction.editReply({
                     embeds: [
                         new MessageEmbed()
                             .setDescription(`Added **${track.info.title}** to queue`)
@@ -68,8 +74,8 @@ export default class PlayCommand {
                 });
                 break;
             case "PLAYLIST_LOADED":
-                player?.queue.add(res.tracks, { requester: interaction.user.tag });
-                await interaction.reply({
+                player?.queue.add(res.tracks, { requester: interaction.user.id });
+                await interaction.editReply({
                     embeds: [
                         new MessageEmbed()
                             .setDescription(`Added playlist **${res.playlistInfo.name}** to queue`)
@@ -77,7 +83,7 @@ export default class PlayCommand {
                 });
                 break;
             case "NO_MATCHES":
-                await interaction.reply({
+                await interaction.editReply({
                     embeds: [
                         new MessageEmbed()
                             .setDescription(`Not found`)

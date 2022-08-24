@@ -21,7 +21,7 @@ export default class QueueCommand {
         interaction: CommandInteraction
     ): Promise<void> {
         this._page = page;
-        const player = interaction.client.lavalink?.getPlayer(interaction.guildId as string);
+        const player = interaction.client.lavalink?.getPlayer(interaction.guildId!);
         if (!player || (player.queue && player.queue.tracks.length === 0)) {
             return await interaction.reply({
                 embeds: [
@@ -47,7 +47,7 @@ export default class QueueCommand {
         const selected: Song[] = this._divdQ[page];
         const embed = new MessageEmbed()
             .setTitle("Queue")
-            .setDescription(`Page: ${page}/${this._divdQ.length}`)
+            .setDescription(`Page: ${page + 1}/${this._divdQ.length}`)
             .setFooter({ text: "This list might be incorrect, please use this command again to update the queue" });
         selected.map((song: Song) => {
             embed.addField(
