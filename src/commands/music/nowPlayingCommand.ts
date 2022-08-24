@@ -9,7 +9,7 @@ export default class NowPlayingCommand {
     public async nowPlaying(interaction: CommandInteraction): Promise<void> {
         const player = interaction.client.lavalink?.getPlayer(interaction.guildId!);
         if (!player || (player && !player.queue.current)) {
-            await interaction.editReply({
+            await interaction.reply({
                 embeds: [
                     new MessageEmbed()
                         .setDescription("No current song")
@@ -19,7 +19,7 @@ export default class NowPlayingCommand {
         }
         const current = player.queue.current;
         const requester = (await interaction.guild?.members.fetch(current?.requester!))?.user;
-        await interaction.editReply({
+        await interaction.reply({
             embeds: [
                 new MessageEmbed()
                     .setTitle("Now Playing")
