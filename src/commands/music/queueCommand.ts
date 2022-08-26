@@ -20,15 +20,17 @@ export default class QueueCommand {
         page: number = 0,
         interaction: CommandInteraction
     ): Promise<void> {
+        await interaction.deferReply();
         this._page = page;
         const player = interaction.client.lavalink?.getPlayer(interaction.guildId!);
         if (!player || (player.queue && player.queue.tracks.length === 0)) {
-            return await interaction.reply({
+            await interaction.editReply({
                 embeds: [
                     new MessageEmbed()
                         .setDescription("Empty queue")
                 ]
             });
+            return;
         }
         this._origQ = player.queue.tracks;
         this._divdQ = this._origQ.reduce((resultArray: any[], item, index) => {
@@ -43,17 +45,26 @@ export default class QueueCommand {
         await this.updateView(interaction, this._page);
     }
 
-    private render(page: number): MessageEmbed {
+    private render(page: number): MessageEmbed | null {
+        if (!this._divdQ) return null;
+        if (page < 0 || page >= this._divdQ.length) {
+            this._page = 0;
+            return this.render(0);
+        }
         const selected: Song[] = this._divdQ[page];
         const embed = new MessageEmbed()
             .setTitle("Queue")
             .setDescription(`Page: ${page + 1}/${this._divdQ.length}`)
             .setFooter({ text: "This list might be incorrect, please use this command again to update the queue" });
         selected.map((song: Song) => {
-            embed.addField(
-                `${this._origQ.indexOf(song) + 1} ${song.title}`,
-                `Requested by: ${song.requester}`,
-                false
+            embed.addFields(
+                [
+                    {
+                        name: `${this._origQ.indexOf(song) + 1}. ${song.title}`,
+                        value: `Requested by: ${song.requester}`,
+                        inline: false
+                    }
+                ]
             );
         });
         return embed;
@@ -61,6 +72,7 @@ export default class QueueCommand {
 
     @ButtonComponent("queue-next-page")
     private async queueNextPage(interaction: ButtonInteraction): Promise<void> {
+        if (!this._divdQ) return;
         this._page++;
         if (this._page >= this._divdQ.length)
             this._page = 0;
@@ -69,6 +81,7 @@ export default class QueueCommand {
 
     @ButtonComponent("queue-prev-page")
     private async queuePrevPage(interaction: ButtonInteraction): Promise<void> {
+        if (!this._divdQ) return;
         this._page--;
         if (this._page < 0)
             this._page = this._divdQ.length - 1;
@@ -82,25 +95,24 @@ export default class QueueCommand {
 
     private async updateView(interaction: CommandInteraction | ButtonInteraction, page: number): Promise<void> {
         const embed = this.render(page);
+        if (!embed) return;
         const row = new MessageActionRow().setComponents(
-            new MessageButton()
-                .setCustomId("queue-next-page")
-                .setLabel("➡️")
-                .setDisabled(this._page === this._divdQ.length - 1)
-                .setStyle("PRIMARY"),
             new MessageButton()
                 .setCustomId("queue-prev-page")
                 .setLabel("⬅️")
                 .setDisabled(this._page === 0)
                 .setStyle("PRIMARY"),
             new MessageButton()
+                .setCustomId("queue-next-page")
+                .setLabel("➡️")
+                .setDisabled(this._page === this._divdQ.length - 1)
+                .setStyle("PRIMARY"),
+            new MessageButton()
                 .setCustomId("queue-close-page")
-                .setLabel("❌")
-                .setDisabled(true)
+                .setLabel("❎")
                 .setStyle("DANGER")
         );
-
-        await interaction.reply({
+        await interaction.editReply({
             embeds: [embed],
             components: [row]
         });
