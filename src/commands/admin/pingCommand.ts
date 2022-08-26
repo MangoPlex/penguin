@@ -1,6 +1,6 @@
-import { Discord, Permission, Slash, SlashOption } from "discordx";
+import { Discord, Slash, SlashOption } from "discordx";
 import { Category, Description } from "@discordx/utilities";
-import { CommandInteraction, MessageEmbed } from "discord.js";
+import { CommandInteraction } from "discord.js";
 import { exec } from "child_process";
 
 import OsUtils from "../../util/osUtils.js";
