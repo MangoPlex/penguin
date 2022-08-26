@@ -27,4 +27,17 @@ export default class TimeUtils {
                 ) * 1e3;
         return milliseconds ? milliseconds : 0;
     }
+
+    public static progressBar(pos: number, dur: number): string {
+        let str: string = "";
+        const percent = Math.floor((pos / dur) * 100);
+        for (let i = 0; i < 20; i++) {
+            if (percent < (i + 1) * 5) {
+                str += "-";
+            } else {
+                str += "=";
+            }
+        }
+        return str;
+    }
 }
