@@ -45,23 +45,24 @@ export default class QueueCommand {
         await this.updateView(interaction, this._page);
     }
 
-    private render(page: number): MessageEmbed | null {
+    private render(interaction: CommandInteraction, page: number): MessageEmbed | null {
         if (!this._divdQ) return null;
         if (page < 0 || page >= this._divdQ.length) {
             this._page = 0;
-            return this.render(0);
+            return this.render(interaction, 0);
         }
         const selected: Song[] = this._divdQ[page];
         const embed = new MessageEmbed()
             .setTitle("Queue")
             .setDescription(`Page: ${page + 1}/${this._divdQ.length}`)
             .setFooter({ text: "This list might be incorrect, please use this command again to update the queue" });
-        selected.map((song: Song) => {
+        selected.map(async(song: Song) => {
+            const requester = await interaction.client.users.fetch(song.requester!);
             embed.addFields(
                 [
                     {
                         name: `${this._origQ.indexOf(song) + 1}. ${song.title}`,
-                        value: `Requested by: ${song.requester}`,
+                        value: `Requested by: ${requester.tag}`,
                         inline: false
                     }
                 ]
@@ -94,7 +95,7 @@ export default class QueueCommand {
     }
 
     private async updateView(interaction: CommandInteraction | ButtonInteraction, page: number): Promise<void> {
-        const embed = this.render(page);
+        const embed = this.render(interaction, page);
         if (!embed) return;
         const row = new MessageActionRow().setComponents(
             new MessageButton()
