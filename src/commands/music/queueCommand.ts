@@ -45,7 +45,7 @@ export default class QueueCommand {
         await this.updateView(interaction, this._page);
     }
 
-    private render(interaction: CommandInteraction, page: number): MessageEmbed | null {
+    private render(interaction: CommandInteraction | ButtonInteraction, page: number): MessageEmbed | null {
         if (!this._divdQ) return null;
         if (page < 0 || page >= this._divdQ.length) {
             this._page = 0;
