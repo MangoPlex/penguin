@@ -5,14 +5,16 @@ import { CommandInteraction } from "discord.js";
 @Discord()
 @Category("Misc Commands")
 export abstract class RollCommand {
-    @Slash("roll")
+    @Slash({ name: "roll" })
     @Description("Roll a random number")
     async roll(
-        @SlashOption("max", {
+        @SlashOption({
+            name: "max",
             description: "The maximum number to roll",
             required: false
         }) max: number = 100,
-        @SlashOption("min", {
+        @SlashOption({
+            name: "min",
             description: "The minimum number to roll",
             required: false
         }) min: number = 1,

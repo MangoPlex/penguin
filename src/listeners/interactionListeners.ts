@@ -4,7 +4,9 @@ import { Client, Discord, On } from "discordx";
 
 @Discord()
 export default class InteractionListeners {
-    @On("interactionCreate")
+    @On({
+        event: "interactionCreate"
+    })
     async onInteractionCreate([interaction]: ArgsOf<"interactionCreate">, client: Client) {
         if (interaction instanceof MessageComponentInteraction)
             await interaction.deferUpdate();

@@ -1,6 +1,6 @@
 import type { ArgsOf } from "discordx";
 import { Client, Discord, On } from "discordx";
-import { VoiceState, Snowflake } from "discord.js";
+import { VoiceState, Snowflake, ChannelType } from "discord.js";
 
 import Settings from "../../settings.js";
 
@@ -8,7 +8,9 @@ import Settings from "../../settings.js";
 export default class VoiceStateUpdateListener {
     public static TEMP_CHANNELS: Snowflake[] = [];
 
-    @On("voiceStateUpdate")
+    @On({
+        event: "voiceStateUpdate"
+    })
     async onVoiceStateUpdate([oldState, newState]: ArgsOf<"voiceStateUpdate">, client: Client) {
         if (oldState.channel && !newState.channel) {
             if (oldState.member?.user.id === oldState.client.user?.id) {
@@ -19,7 +21,7 @@ export default class VoiceStateUpdateListener {
                         m => !m.user.bot
                     ).size === 0
                 )
-                    await oldState.guild.me?.voice.disconnect("No members left");
+                    await oldState.guild.members.me?.voice.disconnect("No members left");
             }
         }
         this.handleTempVoiceChannels(oldState, newState);
@@ -41,11 +43,11 @@ export default class VoiceStateUpdateListener {
         if (voiceChannelJoined || voiceChannelMoved) {
             if (Settings.VOICE_PARENTS.includes(newState.channelId!!)) {
                 const channel = await newState.guild.channels.create(
-                    Settings.VOICE_NAME(newState.member?.user.username!!),
                     {
-                        type: "GUILD_VOICE",
+                        name: Settings.VOICE_NAME(newState.member?.user.username!!),
                         parent: newState.channel?.parentId!!,
                         bitrate: newState.channel?.bitrate,
+                        type: ChannelType.GuildVoice
                     }
                 );
 

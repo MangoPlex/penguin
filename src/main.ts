@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import { Client } from "discordx";
 import { dirname, importx } from "@discordx/importer";
-import { Intents } from "discord.js";
+import { IntentsBitField } from "discord.js";
 
 import * as dotenv from "dotenv";
 import MusicUtils from "./util/musicUtils";
@@ -21,11 +21,11 @@ const startTime = Date.now();
 export const client = new Client({
     // Discord.js
     intents: [
-        Intents.FLAGS.GUILDS,
-        Intents.FLAGS.GUILD_MEMBERS,
-        Intents.FLAGS.GUILD_MESSAGES,
-        Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-        Intents.FLAGS.GUILD_VOICE_STATES
+        IntentsBitField.Flags.Guilds,
+        IntentsBitField.Flags.GuildMembers,
+        IntentsBitField.Flags.GuildMessages,
+        IntentsBitField.Flags.GuildMessageReactions,
+        IntentsBitField.Flags.GuildVoiceStates
     ],
 
     // Discord.ts (Discordx)

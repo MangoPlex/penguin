@@ -1,5 +1,5 @@
-import {Discord, Slash, SlashOption} from "discordx";
-import {CommandInteraction, MessageEmbed} from "discord.js";
+import { Discord, Slash, SlashOption } from "discordx";
+import { CommandInteraction, EmbedBuilder } from "discord.js";
 import { Category, Description } from "@discordx/utilities";
 
 import CryptoHelper from "../../common/cryptoHelper.js";
@@ -7,10 +7,11 @@ import CryptoHelper from "../../common/cryptoHelper.js";
 @Discord()
 @Category("Crypto Commands")
 export abstract class CoinCommand {
-    @Slash("coin")
+    @Slash({ name: "coin" })
     @Description("Get price of the cryptocurrency")
     async coin(
-        @SlashOption("coin", {
+        @SlashOption({
+            name: "coin",
             description: "The coin's name",
             required: true
         }) coin: string,
@@ -32,8 +33,8 @@ export abstract class CoinCommand {
 
             return interaction.editReply({
                 embeds: [
-                    new MessageEmbed()
-                        .setColor('RANDOM')
+                    new EmbedBuilder()
+                        .setColor("Random")
                         .setDescription(`1 ${coin} = ${coinData.usd} (${coinData.vnd})`)
                 ]
             });

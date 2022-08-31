@@ -1,58 +1,49 @@
 import { Description } from "@discordx/utilities";
-import { CommandInteraction, MessageEmbed } from "discord.js";
+import { ApplicationCommandOptionType, CommandInteraction, EmbedBuilder } from "discord.js";
 import { Discord, Slash, SlashOption } from "discordx";
 
 @Discord()
 export default class PlayCommand {
-    @Slash("play")
+    @Slash({ name: "play" })
     @Description("Play music")
     public async play(
-        @SlashOption("url", {
+        @SlashOption({
+            name: "url",
             description: "Url or keyword of the track",
             required: true,
-            type: "STRING"
+            type: ApplicationCommandOptionType.String
         })
         url: string,
         interaction: CommandInteraction
     ): Promise<void> {
         await interaction.deferReply();
-        const botState = interaction.guild?.me?.voice;
-        const member = await interaction.guild?.members.fetch(interaction.user.id);
-        const memberState = member?.voice;
         const lavalink = interaction.client.lavalink;
+        let player = lavalink?.getPlayer(interaction.guildId!);
+        const member = await interaction.guild?.members.fetch(interaction.user.id);
+        const memState = member?.voice;
+        const botState = interaction.guild?.members.me?.voice!;
 
-        if (!memberState?.channelId) {
+        if (!memState?.channel) {
             await interaction.editReply({
                 embeds: [
-                    new MessageEmbed()
-                        .setDescription("Please join a voice channel first")
+                    new EmbedBuilder()
+                        .setColor("Red")
+                        .setDescription("No voice channel detected")
                 ]
             });
             return;
-        }
-        
-
-
-        let player;
-
-        if (botState?.channelId && player) {
-            await interaction.editReply({
-                embeds: [
-                    new MessageEmbed()
-                        .setDescription("The bot is busy at another channel")
-                ]
-            });
-            return;
-        }
-
-        if (botState?.channelId && !player)
-            player = lavalink?.getPlayer(interaction.guildId as string);
-
-        if (!botState?.channelId) {
-            player = lavalink?.createPlayer(
-                interaction.guildId as string
-            );
-            player?.connect(memberState.channelId, { deafened: true });
+        } else {
+            if (!botState.channel || !player) player = lavalink?.createPlayer(interaction.guildId!);
+            else if (memState.channelId !== player.channelId) {
+                await interaction.editReply({
+                    embeds: [
+                        new EmbedBuilder()
+                            .setColor("Red")
+                            .setDescription("Please join the same channel with the bot")
+                    ]
+                });
+                return;
+            }
         }
 
         let res;
@@ -68,7 +59,7 @@ export default class PlayCommand {
                 player?.queue.add(track, { requester: interaction.user.id });
                 await interaction.editReply({
                     embeds: [
-                        new MessageEmbed()
+                        new EmbedBuilder()
                             .setDescription(`Added **${track.info.title}** to queue`)
                     ]
                 });
@@ -77,7 +68,7 @@ export default class PlayCommand {
                 player?.queue.add(res.tracks, { requester: interaction.user.id });
                 await interaction.editReply({
                     embeds: [
-                        new MessageEmbed()
+                        new EmbedBuilder()
                             .setDescription(`Added playlist **${res.playlistInfo.name}** to queue`)
                     ]
                 });
@@ -85,7 +76,7 @@ export default class PlayCommand {
             case "NO_MATCHES":
                 await interaction.editReply({
                     embeds: [
-                        new MessageEmbed()
+                        new EmbedBuilder()
                             .setDescription(`Not found`)
                     ]
                 });

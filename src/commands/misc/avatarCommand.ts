@@ -1,14 +1,15 @@
 import { Discord, Slash, SlashOption } from "discordx";
 import { Category, Description } from "@discordx/utilities";
-import { CommandInteraction, MessageEmbed, User } from "discord.js";
+import { CommandInteraction, EmbedBuilder, User } from "discord.js";
 
 @Discord()
 @Category("Misc Commands")
 export abstract class AvatarCommand {
-    @Slash("avatar")
+    @Slash({ name: "avatar" })
     @Description("See user avatar")
     async avatar(
-        @SlashOption("user", {
+        @SlashOption({
+            name: "user",
             description: "The user to get the avatar",
             required: false
         }) user: User,
@@ -21,9 +22,9 @@ export abstract class AvatarCommand {
 
         await interaction.reply({
             embeds: [ 
-                new MessageEmbed()
+                new EmbedBuilder()
                     .setTitle(`${(await interaction.client.users.fetch(user)).username}'s avatar`)
-                    .setImage(user.displayAvatarURL({ size: 512, dynamic: true }))
+                    .setImage(user.displayAvatarURL({ size: 512, forceStatic: false }))
              ]
         });
     }

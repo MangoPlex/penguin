@@ -2,10 +2,13 @@ import { Client, Discord, Once } from "discordx";
 
 import TimeUtils from "../../util/timeUtils.js";
 import MusicUtils from "../../util/musicUtils.js";
+import { ActivityType, GatewayDispatchEvents } from "discord.js";
 
 @Discord()
 export default class ReadyListener {
-    @Once("ready")
+    @Once({
+        event: "ready"
+    })
     async onReady({ }, client: Client) {
         console.log("Initialized and logged in as " + client.user!.tag);
         console.log("Starting...");
@@ -21,14 +24,14 @@ export default class ReadyListener {
         setInterval(() => {
             client.user!.setActivity(
                 `Uptime: ${TimeUtils.fromMStoDHM(process.uptime() * 1000)}`,
-                { type: "WATCHING" }
+                { type: ActivityType.Watching }
             );
         }, 6e4);
 
         client.lavalink = new MusicUtils(client);
 
         // Workaround because discordx does not support custom emitter
-        client.ws.on("VOICE_SERVER_UPDATE", (data: any) => client.lavalink?.handleVoiceUpdate(data));
-        client.ws.on("VOICE_STATE_UPDATE", (data: any) => client.lavalink?.handleVoiceUpdate(data));
+        client.ws.on(GatewayDispatchEvents.VoiceServerUpdate, (data: any) => client.lavalink?.handleVoiceUpdate(data));
+        client.ws.on(GatewayDispatchEvents.VoiceStateUpdate, (data: any) => client.lavalink?.handleVoiceUpdate(data));
     }
 }

@@ -1,6 +1,6 @@
 import { Description } from "@discordx/utilities";
 import { Song } from "@lavaclient/queue";
-import { ButtonInteraction, CommandInteraction, MessageActionRow, MessageButton, MessageEmbed } from "discord.js";
+import { ApplicationCommandOptionType, ButtonInteraction, CommandInteraction, ActionRowBuilder, ButtonBuilder, EmbedBuilder, ButtonStyle } from "discord.js";
 import { ButtonComponent, Discord, Slash, SlashOption } from "discordx";
 
 @Discord()
@@ -9,13 +9,14 @@ export default class QueueCommand {
     private _divdQ!: Song[][];
     private _origQ!: Song[];
 
-    @Slash("queue")
+    @Slash({ name: "queue" })
     @Description("View queue")
     public async queue(
-        @SlashOption("page", {
+        @SlashOption({
+            name: "page",
             required: false,
             description: "The page of the queue",
-            type: "INTEGER"
+            type: ApplicationCommandOptionType.Integer
         })
         page: number = 0,
         interaction: CommandInteraction
@@ -26,7 +27,7 @@ export default class QueueCommand {
         if (!player || (player.queue && player.queue.tracks.length === 0)) {
             await interaction.editReply({
                 embeds: [
-                    new MessageEmbed()
+                    new EmbedBuilder()
                         .setDescription("Empty queue")
                 ]
             });
@@ -45,18 +46,18 @@ export default class QueueCommand {
         await this.updateView(interaction, this._page);
     }
 
-    private render(interaction: CommandInteraction | ButtonInteraction, page: number): MessageEmbed | null {
+    private render(interaction: CommandInteraction | ButtonInteraction, page: number): EmbedBuilder | null {
         if (!this._divdQ) return null;
         if (page < 0 || page >= this._divdQ.length) {
             this._page = 0;
             return this.render(interaction, 0);
         }
         const selected: Song[] = this._divdQ[page];
-        const embed = new MessageEmbed()
+        const embed = new EmbedBuilder()
             .setTitle("Queue")
             .setDescription(`Page: ${page + 1}/${this._divdQ.length}`)
             .setFooter({ text: "This list might be incorrect, please use this command again to update the queue" });
-        selected.map(async(song: Song) => {
+        selected.map(async (song: Song) => {
             const requester = await interaction.client.users.fetch(song.requester!);
             embed.addFields(
                 [
@@ -71,7 +72,7 @@ export default class QueueCommand {
         return embed;
     }
 
-    @ButtonComponent("queue-next-page")
+    @ButtonComponent({ id: "queue-next-page" })
     private async queueNextPage(interaction: ButtonInteraction): Promise<void> {
         if (!this._divdQ) return;
         this._page++;
@@ -80,7 +81,7 @@ export default class QueueCommand {
         await this.updateView(interaction, this._page);
     }
 
-    @ButtonComponent("queue-prev-page")
+    @ButtonComponent({ id: "queue-prev-page" })
     private async queuePrevPage(interaction: ButtonInteraction): Promise<void> {
         if (!this._divdQ) return;
         this._page--;
@@ -89,7 +90,7 @@ export default class QueueCommand {
         await this.updateView(interaction, this._page);
     }
 
-    @ButtonComponent("queue-close-page")
+    @ButtonComponent({ id: "queue-close-page" })
     private async queueClosePage(interaction: ButtonInteraction): Promise<void> {
         await interaction.deleteReply();
     }
@@ -97,21 +98,21 @@ export default class QueueCommand {
     private async updateView(interaction: CommandInteraction | ButtonInteraction, page: number): Promise<void> {
         const embed = this.render(interaction, page);
         if (!embed) return;
-        const row = new MessageActionRow().setComponents(
-            new MessageButton()
+        const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+            new ButtonBuilder()
                 .setCustomId("queue-prev-page")
                 .setLabel("⬅️")
                 .setDisabled(this._page === 0)
-                .setStyle("PRIMARY"),
-            new MessageButton()
+                .setStyle(ButtonStyle.Primary),
+            new ButtonBuilder()
                 .setCustomId("queue-next-page")
                 .setLabel("➡️")
                 .setDisabled(this._page === this._divdQ.length - 1)
-                .setStyle("PRIMARY"),
-            new MessageButton()
+                .setStyle(ButtonStyle.Primary),
+            new ButtonBuilder()
                 .setCustomId("queue-close-page")
-                .setLabel("❎")
-                .setStyle("DANGER")
+                .setLabel("❌")
+                .setStyle(ButtonStyle.Primary)
         );
         await interaction.editReply({
             embeds: [embed],

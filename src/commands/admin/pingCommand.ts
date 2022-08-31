@@ -8,13 +8,14 @@ import OsUtils from "../../util/osUtils.js";
 @Discord()
 @Category("Admin Commands")
 export abstract class PingCommand {
-    @Slash("ping")
+    @Slash({ name: "ping" })
     @Description("Ping a domain or ip")
         // Removed bc bots cannot control permission anymore
         // see: https://discord.com/developers/docs/topics/permissions
     // @Permission({ id: "920654387859296286", type: "ROLE", permission: true })
     async say(
-        @SlashOption("ip", {
+        @SlashOption({
+            name: "ip",
             description: "Provide an ip or domain",
             required: false
         }) ip: string,
