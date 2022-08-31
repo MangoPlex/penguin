@@ -83,6 +83,8 @@ export default class PlayCommand {
                 break;
         }
 
+        if (!player?.connected) player?.connect(memState.channelId);
+
         if (!player?.queue.current)
             await player?.queue.start();
     }
