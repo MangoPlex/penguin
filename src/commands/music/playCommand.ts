@@ -46,6 +46,8 @@ export default class PlayCommand {
             }
         }
 
+        // player?.queue.on("trackEnd", async () => await player?.queue.next());
+
         let res;
 
         if (this.checkUrl(url))
@@ -85,7 +87,7 @@ export default class PlayCommand {
 
         if (!player?.connected) player?.connect(memState.channelId);
 
-        if (!player?.queue.current)
+        if (!player?.trackData)
             await player?.queue.start();
     }
 
