@@ -34,8 +34,16 @@ export default class VoiceStateUpdateListener {
 
         if (voiceChannelLeft || voiceChannelMoved) {
             if (VoiceStateUpdateListener.TEMP_CHANNELS.some(channelId => channelId == oldState.channelId)) {
-                if (oldState.channel!!.members.size === 0) {
-                    oldState.channel!!.delete().then(() => VoiceStateUpdateListener.TEMP_CHANNELS = VoiceStateUpdateListener.TEMP_CHANNELS.filter(channelId => channelId != oldState.channelId));
+                if (oldState.channel!!.members.filter(
+                    (m) => !m.user.bot
+                ).size === 0) {
+                    try {
+                        await oldState.channel!!.delete();
+                        VoiceStateUpdateListener.TEMP_CHANNELS = VoiceStateUpdateListener.TEMP_CHANNELS.filter(channelId => channelId != oldState.channelId);
+                    } catch (ignore) {
+                        const reFetch = await oldState.client.channels.fetch(oldState.channelId!);
+                        if (reFetch) await reFetch.delete();
+                    }
                 }
             }
         }
