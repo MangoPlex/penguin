@@ -8,11 +8,6 @@ export class EvenOddCommand {
     @Description("Đánh chẵn lẻ cực uy tín")
     public async evenOdd(interaction: CommandInteraction): Promise<void> {
         const rand = Math.floor(Math.random() * 100);
-        await interaction.reply({
-            embeds: [
-                new EmbedBuilder()
-                    .setDescription(rand % 2 === 0 ? "Chẵn" : "Lẻ")
-            ]
-        });
+        await interaction.reply(rand % 2 === 0 ? "Chẵn" : "Lẻ");
     }
 }
