@@ -40,10 +40,7 @@ export default class VoiceStateUpdateListener {
                     try {
                         await oldState.channel!!.delete();
                         VoiceStateUpdateListener.TEMP_CHANNELS = VoiceStateUpdateListener.TEMP_CHANNELS.filter(channelId => channelId != oldState.channelId);
-                    } catch (ignore) {
-                        const reFetch = await oldState.client.channels.fetch(oldState.channelId!);
-                        if (reFetch) await reFetch.delete();
-                    }
+                    } catch (ignore) { }
                 }
             }
         }
