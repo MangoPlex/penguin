@@ -2,44 +2,65 @@ import { ChatInputCommand, Command } from "@sapphire/framework";
 import { MessageEmbed } from "discord.js";
 
 import CryptoHelper from "../../common/cryptoHelper.js";
+import {ApplyOptions} from "@sapphire/decorators";
 
+@ApplyOptions<Command.Options>({
+  name: "coin",
+  description: 'Get price of the cryptocurrency',
+})
 export class CoinCommand extends Command {
-    public constructor(context: Command.Context, options: Command.Options) {
-        super(context, { ...options });
-    }
+  private static usdFormatter = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  });
 
-    public async chatInputRun(interaction: Command.ChatInputInteraction): Promise<void> {
-        let coin = interaction.options.getString("coin")?.toLowerCase()!;
+  private static vndFormatter = new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  });
 
-        if (coin === "btc") coin = "bitcoin";
-        else if (coin === "eth") coin = "ethereum";
-        else if (coin === "mana") coin = "decentraland";
-        else if (coin === "doge") coin = "dogecoin";
-        else if (coin === "matic") coin = "polygon";
+  public override registerApplicationCommands(
+      registry: ChatInputCommand.Registry
+  ) {
+    registry.registerChatInputCommand((builder) =>
+        builder
+            .setName(this.name)
+            .setDescription(this.description)
+            .addStringOption((input) =>
+                input.setName("coins").setDescription("The coin's name").setRequired(true)
+            )
+    );
+  }
 
-        await interaction.deferReply();
+  public async chatInputRun(
+    interaction: Command.ChatInputInteraction
+  ): Promise<void> {
+    let coin = interaction.options.getString("coins")?.toLowerCase()
+        .replace("btc", "bitcoin")
+        .replace("eth", "ethereum")
+        .replace("doge", "dogecoin")
+        .replace("mana", "decentraland")
+        .replace("ltc", "litecoin")
+        .replace("bnb", "binancecoin")
+        .replace("matic", "polygon")!;
 
-        try {
-            const coinData = await CryptoHelper.getCryptoPrice(coin);
+    await interaction.deferReply();
 
-            interaction.editReply({
-                embeds: [
-                    new MessageEmbed()
-                        .setColor("RANDOM")
-                        .setDescription(`1 ${coin} = ${coinData.usd} (${coinData.vnd})`)
-                ]
-            });
-            return;
-        } catch (e) {
-            interaction.editReply({ content: "Coin not found" });
-            return;
-        }
-    }
+    try {
+      const allData = await CryptoHelper.getCryptoPrice(coin);
+      const embed = new MessageEmbed().setColor("YELLOW");
 
-    public override registerApplicationCommands(registry: ChatInputCommand.Registry) {
-        registry.registerChatInputCommand((builder) =>
-            builder.setName("coin").setDescription("Get price of the cryptocurrency")
-                .addStringOption((input) => input.setName("coin").setDescription("The coin's name"))
+      for (let data of allData) {
+        embed.addFields(
+            { name: `${data.coin.toUpperCase()}`, value: `${CoinCommand.usdFormatter.format(data.currency.usd)} (${CoinCommand.vndFormatter.format(data.currency.vnd)})`, inline: false },
         );
+      }
+
+      await interaction.editReply({
+        embeds: [embed],
+      });
+    } catch (e) {
+      await interaction.editReply({ content: "Coin not found" });
     }
+  }
 }

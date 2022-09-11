@@ -1,31 +1,39 @@
 {
   "name": "penguin",
   "version": "1.0.0",
-  "type": "module",
   "main": "build/main.js",
-  "scripts": {
-    "build": "tsc",
-    "build:changelog": "npx @discordx/changelog --root=src",
-    "dev": "node --loader ts-node/esm/transpile-only src/main.ts",
-    "start": "node ."
-  },
   "repository": "git@github.com:MangoPlex/Penguin.git",
   "author": "MangoPlex",
   "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "start": "node .",
+    "dev": "run-s build start",
+    "watch:start": "tsc-watch --onSuccess \"node .\"",
+    "format": "prettier --write \"src/**/*.ts\""
+  },
   "dependencies": {
     "@lavaclient/queue": "^2.1.0",
+    "@sapphire/decorators": "^5.0.0",
+    "@sapphire/discord.js-utilities": "^5.0.0",
+    "@sapphire/fetch": "^2.4.1",
     "@sapphire/framework": "^3.1.1",
     "@sapphire/plugin-logger": "^3.0.0",
+    "@sapphire/utilities": "^3.9.3",
     "@types/node": "^18.7.14",
-    "axios": "^0.27.2",
     "discord.js": "^13.10.3",
-    "dotenv": "^16.0.2",
     "lavaclient": "^4.1.1",
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
-    "nodemon": "^2.0.15",
+    "@sapphire/prettier-config": "^1.4.4",
+    "@sapphire/ts-config": "^3.3.4",
+    "dotenv": "^16.0.2",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.7.1",
     "ts-node": "^10.7.0",
+    "tsc-watch": "^5.0.3",
     "typescript": "^4.6.2"
   }
 }

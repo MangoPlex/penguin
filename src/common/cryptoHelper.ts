@@ -1,28 +1,33 @@
-import * as axios from "axios";
+import { fetch, FetchResultTypes } from "@sapphire/fetch";
 
 export default class CryptoHelper {
-    private static usdCurrencyFormatter = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD'
-    });
-    
-    private static vndCurrencyFormatter = new Intl.NumberFormat('vi-VN', {
-        style: 'currency',
-        currency: 'VND'
-    });
+  public static async getCryptoPrice(coin: string): Promise<Response[]> {
+    const coins = coin.split(",");
 
-    public static async getCryptoPrice(coin: string) {
-        const usd = await axios.default.get(
-            `https://api.coingecko.com/api/v3/simple/price?ids=${coin}&vs_currencies=usd`
-        ).then(res => {
-            return CryptoHelper.usdCurrencyFormatter.format(res.data[coin]["usd"])
-        });
-        const vnd = await axios.default.get(
-            `https://api.coingecko.com/api/v3/simple/price?ids=${coin}&vs_currencies=vnd`
-        ).then(res => {
-            return CryptoHelper.vndCurrencyFormatter.format(res.data[coin]["vnd"])
-        });
+    return fetch(
+      `https://api.coingecko.com/api/v3/simple/price?ids=${coin}&vs_currencies=usd,vnd`,
+      FetchResultTypes.Text
+    ).then((res) => {
+      let result: Response[] = [];
 
-        return { usd, vnd };
-    }
+      for (const coin of coins) {
+        result.push({
+          coin: coin,
+          currency: JSON.parse(res)[coin],
+        });
+      }
+
+      return result;
+    });
+  }
+}
+
+interface Response {
+  coin: string;
+  currency: Currency;
+}
+
+interface Currency {
+  usd: number;
+  vnd: number;
 }
