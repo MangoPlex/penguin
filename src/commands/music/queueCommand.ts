@@ -1,122 +1,55 @@
-import { Description } from "@discordx/utilities";
 import { Song } from "@lavaclient/queue";
-import { ApplicationCommandOptionType, ButtonInteraction, CommandInteraction, ActionRowBuilder, ButtonBuilder, EmbedBuilder, ButtonStyle } from "discord.js";
-import { ButtonComponent, Discord, Slash, SlashOption } from "discordx";
+import { ChatInputCommand, Command } from "@sapphire/framework";
+import { MessageEmbed } from "discord.js";
+import ArrayUtils from "../../util/arrayUtils.js";
 
-@Discord()
-export default class QueueCommand {
-    private _page: number = 0;
-    private _divdQ!: Song[][];
-    private _origQ!: Song[];
+export default class QueueCommand extends Command {
 
-    @Slash({ name: "queue" })
-    @Description("View queue")
-    public async queue(
-        @SlashOption({
-            name: "page",
-            required: false,
-            description: "The page of the queue",
-            type: ApplicationCommandOptionType.Integer
-        })
-        page: number = 0,
-        interaction: CommandInteraction
-    ): Promise<void> {
+    public constructor(context: Command.Context, options: Command.Options) {
+        super(context, { ...options });
+    }
+
+    public async chatInputRun(interaction: Command.ChatInputInteraction): Promise<void> {
         await interaction.deferReply();
-        this._page = page;
         const player = interaction.client.lavalink?.getPlayer(interaction.guildId!);
         if (!player || (player.queue && player.queue.tracks.length === 0)) {
             await interaction.editReply({
                 embeds: [
-                    new EmbedBuilder()
+                    new MessageEmbed()
                         .setDescription("Empty queue")
                 ]
             });
             return;
         }
-        this._origQ = player.queue.tracks;
-        this._divdQ = this._origQ.reduce((resultArray: any[], item, index) => {
-            const chunkIndex = Math.floor(index / 5);
 
-            if (!resultArray[chunkIndex]) {
-                resultArray[chunkIndex] = [];
-            }
-            resultArray[chunkIndex].push(item);
-            return resultArray;
-        }, []);
-        await this.updateView(interaction, this._page);
-    }
-
-    private render(interaction: CommandInteraction | ButtonInteraction, page: number): EmbedBuilder | null {
-        if (!this._divdQ) return null;
-        if (page < 0 || page >= this._divdQ.length) {
-            this._page = 0;
-            return this.render(interaction, 0);
-        }
-        const selected: Song[] = this._divdQ[page];
-        const embed = new EmbedBuilder()
+        const div = ArrayUtils.divQueue(player.queue.tracks, 5);
+        const sel = div[0];
+        const embed = new MessageEmbed()
             .setTitle("Queue")
-            .setDescription(`Page: ${page + 1}/${this._divdQ.length}`)
-            .setFooter({ text: "This list might be incorrect, please use this command again to update the queue" });
-        selected.map(async (song: Song) => {
+            .setDescription(`Page: 1/${div.length}`);
+        sel.map(async (song: Song) => {
             const requester = await interaction.client.users.fetch(song.requester!);
             embed.addFields(
                 [
                     {
-                        name: `${this._origQ.indexOf(song) + 1}. ${song.title}`,
+                        name: `${div.indexOf(song) + 1}. ${song.title}`,
                         value: `Requested by: ${requester.tag}`,
                         inline: false
                     }
                 ]
             );
         });
-        return embed;
-    }
 
-    @ButtonComponent({ id: "queue-next-page" })
-    private async queueNextPage(interaction: ButtonInteraction): Promise<void> {
-        if (!this._divdQ) return;
-        this._page++;
-        if (this._page >= this._divdQ.length)
-            this._page = 0;
-        await this.updateView(interaction, this._page);
-    }
-
-    @ButtonComponent({ id: "queue-prev-page" })
-    private async queuePrevPage(interaction: ButtonInteraction): Promise<void> {
-        if (!this._divdQ) return;
-        this._page--;
-        if (this._page < 0)
-            this._page = this._divdQ.length - 1;
-        await this.updateView(interaction, this._page);
-    }
-
-    @ButtonComponent({ id: "queue-close-page" })
-    private async queueClosePage(interaction: ButtonInteraction): Promise<void> {
-        await interaction.deleteReply();
-    }
-
-    private async updateView(interaction: CommandInteraction | ButtonInteraction, page: number): Promise<void> {
-        const embed = this.render(interaction, page);
-        if (!embed) return;
-        const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
-            new ButtonBuilder()
-                .setCustomId("queue-prev-page")
-                .setLabel("⬅️")
-                .setDisabled(this._page === 0)
-                .setStyle(ButtonStyle.Primary),
-            new ButtonBuilder()
-                .setCustomId("queue-next-page")
-                .setLabel("➡️")
-                .setDisabled(this._page === this._divdQ.length - 1)
-                .setStyle(ButtonStyle.Primary),
-            new ButtonBuilder()
-                .setCustomId("queue-close-page")
-                .setLabel("❌")
-                .setStyle(ButtonStyle.Primary)
-        );
         await interaction.editReply({
-            embeds: [embed],
-            components: [row]
+            embeds: [embed]
         });
+    }
+
+
+    public override registerApplicationCommands(registry: ChatInputCommand.Registry) {
+        registry.registerChatInputCommand((builder) =>
+            builder.setName("queue").setDescription("View the queue")
+                .addIntegerOption((input) => input.setName("page").setDescription("The page of the queue").setRequired(false))
+        );
     }
 }

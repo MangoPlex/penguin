@@ -1,12 +1,15 @@
-import type { ArgsOf } from "discordx";
-import { Client, Discord, On } from "discordx";
+import { Listener } from "@sapphire/framework";
+import { Message } from "discord.js";
 
-@Discord()
-export default class MessageCreateListeners {
-    @On({
-        event: "messageCreate"
-    })
-    async onMessageCreate([message]: ArgsOf<"messageCreate">, client: Client) {
+export class MessageCreateListeners extends Listener {
+    public constructor(context: Listener.Context, options: Listener.Options) {
+        super(context, {
+            ...options,
+            event: "messageCreate"
+        });
+    }
+
+    public async run(message: Message): Promise<void> {
         if (message.author.bot) return;
     }
 }

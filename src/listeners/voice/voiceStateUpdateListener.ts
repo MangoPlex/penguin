@@ -1,17 +1,19 @@
-import type { ArgsOf } from "discordx";
-import { Client, Discord, On } from "discordx";
-import { VoiceState, Snowflake, ChannelType } from "discord.js";
+import { Listener } from "@sapphire/framework";
+import { VoiceState, Snowflake } from "discord.js";
 
 import Settings from "../../settings.js";
 
-@Discord()
-export default class VoiceStateUpdateListener {
+export class VoiceStateUpdateListener extends Listener {
     public static TEMP_CHANNELS: Snowflake[] = [];
+    public constructor(context: Listener.Context, options: Listener.Options) {
+        super(context, {
+            ...options,
+            event: "voiceStateUpdate"
+        });
+    }
 
-    @On({
-        event: "voiceStateUpdate"
-    })
-    async onVoiceStateUpdate([oldState, newState]: ArgsOf<"voiceStateUpdate">, client: Client) {
+    public async run(oldState: VoiceState, newState: VoiceState): Promise<void> {
+        const { client } = this.container;
         if (oldState.channel && !newState.channel) {
             if (oldState.member?.user.id === oldState.client.user?.id) {
                 await oldState.client.lavalink?.destroyPlayer(newState.guild.id);
@@ -21,7 +23,7 @@ export default class VoiceStateUpdateListener {
                         m => !m.user.bot
                     ).size === 0
                 )
-                    await oldState.guild.members.me?.voice.disconnect("No members left");
+                    await oldState.guild.me?.voice.disconnect("No members left");
             }
         }
         this.handleTempVoiceChannels(oldState, newState);
@@ -48,11 +50,11 @@ export default class VoiceStateUpdateListener {
         if (voiceChannelJoined || voiceChannelMoved) {
             if (Settings.VOICE_PARENTS.includes(newState.channelId!!)) {
                 const channel = await newState.guild.channels.create(
+                    Settings.VOICE_NAME(newState.member?.user.username!!),
                     {
-                        name: Settings.VOICE_NAME(newState.member?.user.username!!),
                         parent: newState.channel?.parentId!!,
                         bitrate: newState.channel?.bitrate,
-                        type: ChannelType.GuildVoice
+                        type: "GUILD_VOICE"
                     }
                 );
 

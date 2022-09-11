@@ -1,33 +1,24 @@
-import { Description } from "@discordx/utilities";
-import { ApplicationCommandOptionType, CommandInteraction, EmbedBuilder } from "discord.js";
-import { Discord, Slash, SlashOption } from "discordx";
+import { ChatInputCommand, Command } from "@sapphire/framework";
+import { MessageEmbed } from "discord.js";
 
-@Discord()
-export default class PlayCommand {
-    @Slash({ name: "play" })
-    @Description("Play music")
-    public async play(
-        @SlashOption({
-            name: "url",
-            description: "Url or keyword of the track",
-            required: true,
-            type: ApplicationCommandOptionType.String
-        })
-        url: string,
-        interaction: CommandInteraction
-    ): Promise<void> {
+export class PlayCommand extends Command {
+    public constructor(context: Command.Context, options: Command.Options) {
+        super(context, { ...options });
+    }
+
+    public async play(interaction: Command.ChatInputInteraction): Promise<void> {
         await interaction.deferReply();
         const lavalink = interaction.client.lavalink;
         let player = lavalink?.getPlayer(interaction.guildId!);
         const member = await interaction.guild?.members.fetch(interaction.user.id);
         const memState = member?.voice;
-        const botState = interaction.guild?.members.me?.voice!;
+        const botState = interaction.guild?.me?.voice!;
 
         if (!memState?.channel) {
             await interaction.editReply({
                 embeds: [
-                    new EmbedBuilder()
-                        .setColor("Red")
+                    new MessageEmbed()
+                        .setColor("RED")
                         .setDescription("No voice channel detected")
                 ]
             });
@@ -37,8 +28,8 @@ export default class PlayCommand {
             else if (memState.channelId !== player.channelId) {
                 await interaction.editReply({
                     embeds: [
-                        new EmbedBuilder()
-                            .setColor("Red")
+                        new MessageEmbed()
+                            .setColor("RED")
                             .setDescription("Please join the same channel with the bot")
                     ]
                 });
@@ -46,7 +37,7 @@ export default class PlayCommand {
             }
         }
 
-        // player?.queue.on("trackEnd", async () => await player?.queue.next());
+        const url = interaction.options.getString("url")!;
 
         let res;
 
@@ -61,7 +52,7 @@ export default class PlayCommand {
                 player?.queue.add(track, { requester: interaction.user.id });
                 await interaction.editReply({
                     embeds: [
-                        new EmbedBuilder()
+                        new MessageEmbed()
                             .setDescription(`Added **${track.info.title}** to queue`)
                     ]
                 });
@@ -70,7 +61,7 @@ export default class PlayCommand {
                 player?.queue.add(res.tracks, { requester: interaction.user.id });
                 await interaction.editReply({
                     embeds: [
-                        new EmbedBuilder()
+                        new MessageEmbed()
                             .setDescription(`Added playlist **${res.playlistInfo.name}** to queue`)
                     ]
                 });
@@ -78,7 +69,7 @@ export default class PlayCommand {
             case "NO_MATCHES":
                 await interaction.editReply({
                     embeds: [
-                        new EmbedBuilder()
+                        new MessageEmbed()
                             .setDescription(`Not found`)
                     ]
                 });
@@ -98,5 +89,12 @@ export default class PlayCommand {
         } catch (e) {
             return false;
         }
+    }
+
+    public override registerApplicationCommands(registry: ChatInputCommand.Registry) {
+        registry.registerChatInputCommand((builder) =>
+            builder.setName("play").setDescription("Play music")
+                .addStringOption((input) => input.setName("url").setDescription("Url/keyword of the track"))
+        );
     }
 }

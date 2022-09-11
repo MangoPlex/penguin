@@ -1,7 +1,6 @@
-import "reflect-metadata";
-import { Client } from "discordx";
-import { dirname, importx } from "@discordx/importer";
-import { IntentsBitField } from "discord.js";
+import "@sapphire/plugin-logger/register";
+import { SapphireClient, LogLevel } from "@sapphire/framework";
+import { Intents } from "discord.js";
 
 import * as dotenv from "dotenv";
 import MusicUtils from "./util/musicUtils";
@@ -18,24 +17,18 @@ declare module "discord.js" {
 
 const startTime = Date.now();
 
-export const client = new Client({
-    // Discord.js
+export const client = new SapphireClient({
     intents: [
-        IntentsBitField.Flags.Guilds,
-        IntentsBitField.Flags.GuildMembers,
-        IntentsBitField.Flags.GuildMessages,
-        IntentsBitField.Flags.GuildMessageReactions,
-        IntentsBitField.Flags.GuildVoiceStates
+        Intents.FLAGS.GUILDS,
+        Intents.FLAGS.GUILD_MEMBERS,
+        Intents.FLAGS.GUILD_MESSAGES,
+        Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+        Intents.FLAGS.GUILD_VOICE_STATES
     ],
-
-    // Discord.ts (Discordx)
-    botGuilds: [(client) => client.guilds.cache.map((guild) => guild.id)],
-
+    logger: {
+        level: process.env.NODE_ENV !== "production" ? LogLevel.Debug : LogLevel.Error
+    }
 });
 
-console.log("Initializing...");
-console.log("Importing command/listener classes...");
-await importx(dirname(import.meta.url) + "/{listeners,commands}/**/*.{ts,js}");
-console.log("Imported")
 await client.login(process.env.DISCORD_TOKEN!);
-console.log(`Started! (${Date.now() - startTime}ms)`)
+client.logger.info(`Started! (${Date.now() - startTime}ms)`);

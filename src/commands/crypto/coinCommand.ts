@@ -1,24 +1,15 @@
-import { Discord, Slash, SlashOption } from "discordx";
-import { CommandInteraction, EmbedBuilder } from "discord.js";
-import { Category, Description } from "@discordx/utilities";
+import { ChatInputCommand, Command } from "@sapphire/framework";
+import { MessageEmbed } from "discord.js";
 
 import CryptoHelper from "../../common/cryptoHelper.js";
 
-@Discord()
-@Category("Crypto Commands")
-export abstract class CoinCommand {
-    @Slash({ name: "coin" })
-    @Description("Get price of the cryptocurrency")
-    async coin(
-        @SlashOption({
-            name: "coin",
-            description: "The coin's name",
-            required: true
-        }) coin: string,
+export class CoinCommand extends Command {
+    public constructor(context: Command.Context, options: Command.Options) {
+        super(context, { ...options });
+    }
 
-        interaction: CommandInteraction
-    ) {
-        coin = coin.toLowerCase();
+    public async chatInputRun(interaction: Command.ChatInputInteraction): Promise<void> {
+        let coin = interaction.options.getString("coin")?.toLowerCase()!;
 
         if (coin === "btc") coin = "bitcoin";
         else if (coin === "eth") coin = "ethereum";
@@ -31,15 +22,24 @@ export abstract class CoinCommand {
         try {
             const coinData = await CryptoHelper.getCryptoPrice(coin);
 
-            return interaction.editReply({
+            interaction.editReply({
                 embeds: [
-                    new EmbedBuilder()
-                        .setColor("Random")
+                    new MessageEmbed()
+                        .setColor("RANDOM")
                         .setDescription(`1 ${coin} = ${coinData.usd} (${coinData.vnd})`)
                 ]
             });
+            return;
         } catch (e) {
-            return interaction.editReply({ content: "Coin not found" });
+            interaction.editReply({ content: "Coin not found" });
+            return;
         }
+    }
+
+    public override registerApplicationCommands(registry: ChatInputCommand.Registry) {
+        registry.registerChatInputCommand((builder) =>
+            builder.setName("coin").setDescription("Get price of the cryptocurrency")
+                .addStringOption((input) => input.setName("coin").setDescription("The coin's name"))
+        );
     }
 }

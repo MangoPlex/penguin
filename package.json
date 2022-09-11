@@ -13,13 +13,12 @@
   "author": "MangoPlex",
   "license": "MIT",
   "dependencies": {
-    "@discordx/importer": "^1.1.2",
-    "@discordx/utilities": "^5.0.0",
     "@lavaclient/queue": "^2.1.0",
+    "@sapphire/framework": "^3.1.1",
+    "@sapphire/plugin-logger": "^3.0.0",
     "@types/node": "^18.7.14",
     "axios": "^0.27.2",
-    "discord.js": "^14.3.0",
-    "discordx": "^11.1.12",
+    "discord.js": "^13.10.3",
     "dotenv": "^16.0.2",
     "lavaclient": "^4.1.1",
     "reflect-metadata": "^0.1.13"

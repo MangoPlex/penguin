@@ -1,18 +1,19 @@
-import { Description } from "@discordx/utilities";
-import { CommandInteraction, EmbedBuilder } from "discord.js";
-import { Discord, Slash } from "discordx";
+import { ChatInputCommand, Command } from "@sapphire/framework";
+import { MessageEmbed } from "discord.js";
 import TimeUtils from "../../util/timeUtils.js";
 
-@Discord()
-export default class ControllerCommand {
-    @Slash({ name: "controller" })
-    @Description("Control the music player")
-    public async nowPlaying(interaction: CommandInteraction): Promise<void> {
+
+export class ControllerCommand extends Command {
+    public constructor(context: Command.Context, options: Command.Options) {
+        super(context, { ...options });
+    }
+
+    public async chatInputRun(interaction: Command.ChatInputInteraction): Promise<void> {
         const player = interaction.client.lavalink?.getPlayer(interaction.guildId!);
         if (!player || (player && !player.queue.current)) {
             await interaction.reply({
                 embeds: [
-                    new EmbedBuilder()
+                    new MessageEmbed()
                         .setDescription("No current song")
                 ]
             });
@@ -22,7 +23,7 @@ export default class ControllerCommand {
         const requester = (await interaction.guild?.members.fetch(current?.requester!))?.user;
         await interaction.reply({
             embeds: [
-                new EmbedBuilder()
+                new MessageEmbed()
                     .setTitle("Now Playing")
                     .addFields([
                         {
@@ -39,5 +40,11 @@ export default class ControllerCommand {
                     ])
             ]
         });
+    }
+
+    public override registerApplicationCommands(registry: ChatInputCommand.Registry) {
+        registry.registerChatInputCommand((builder) =>
+            builder.setName("controller").setDescription("Control the player")
+        );
     }
 }

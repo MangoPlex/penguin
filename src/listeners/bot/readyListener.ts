@@ -1,37 +1,27 @@
-import { Client, Discord, Once } from "discordx";
-
 import TimeUtils from "../../util/timeUtils.js";
 import MusicUtils from "../../util/musicUtils.js";
-import { ActivityType, GatewayDispatchEvents } from "discord.js";
+import { Listener } from "@sapphire/framework";
 
-@Discord()
-export default class ReadyListener {
-    @Once({
-        event: "ready"
-    })
-    async onReady({ }, client: Client) {
-        console.log("Initialized and logged in as " + client.user!.tag);
-        console.log("Starting...");
-
-        await client.initApplicationCommands({
-            guild: { log: true },
-            global: { log: false },
+export class ReadyListener extends Listener {
+    public constructor(context: Listener.Context, options: Listener.Options) {
+        super(context, {
+            ...options,
+            event: "ready"
         });
-        // Removed bc bots cannot control permission anymore
-        // see: https://discord.com/developers/docs/topics/permissions
-        // await client.initApplicationPermissions();
+    }
+
+    public async run(): Promise<void> {
+        const { client } = this.container;
+        this.container.logger.info("Initialized and logged in as " + client.user!.tag);
+        this.container.logger.info("Starting...");
 
         setInterval(() => {
             client.user!.setActivity(
                 `Uptime: ${TimeUtils.fromMStoDHM(process.uptime() * 1000)}`,
-                { type: ActivityType.Watching }
+                { type: "WATCHING" }
             );
         }, 6e4);
 
         client.lavalink = new MusicUtils(client);
-
-        // Workaround because discordx does not support custom emitter
-        client.ws.on(GatewayDispatchEvents.VoiceServerUpdate, (data: any) => client.lavalink?.handleVoiceUpdate(data));
-        client.ws.on(GatewayDispatchEvents.VoiceStateUpdate, (data: any) => client.lavalink?.handleVoiceUpdate(data));
     }
 }
