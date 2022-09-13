@@ -12,6 +12,6 @@ export class GuildMemberAddListener extends Listener {
     }
 
     public async run(member: GuildMember): Promise<void> {
-        await new PUser(defaultPUser(member.id)).save();
+        if (!member.user.bot) await new PUser(defaultPUser(member.id)).save();
     }
 }

@@ -24,7 +24,7 @@ export class ReadyListener extends Listener {
 
     const guild: Guild = await this.container.client.guilds.fetch(Settings.SERVER_ID);
     guild.members.cache.forEach(async (m) => {
-      if (!await PUser.findOne({ id: m.id })) {
+      if (!await PUser.findOne({ id: m.id }) && !m.user.bot) {
         await new PUser(defaultPUser(m.id)).save();
       }
     });
