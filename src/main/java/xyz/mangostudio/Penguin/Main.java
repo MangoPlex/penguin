@@ -26,7 +26,6 @@ public class Main {
 
 
     public static void main(String[] args) {
-
         JDABuilder
                 .create(INTENTS)
                 .setToken((String) PROPERTIES.get("token"))
