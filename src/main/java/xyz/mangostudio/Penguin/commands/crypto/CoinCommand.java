@@ -1,11 +1,12 @@
 package xyz.mangostudio.Penguin.commands.crypto;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import org.json.JSONObject;
 import xyz.mangostudio.Penguin.structures.Command;
 import xyz.mangostudio.Penguin.utils.CryptoUtils;
 
@@ -30,9 +31,10 @@ public class CoinCommand extends Command {
             return;
         }
 
-        JSONObject jo = new JSONObject(coinPriceData).getJSONObject(coin);
-        int usd = jo.getInt("usd");
-        int vnd = jo.getInt("vnd");
+        Gson gson = new Gson();
+        JsonObject jo = gson.fromJson(coinPriceData, JsonObject.class).getAsJsonObject(coin);
+        int usd = jo.get("usd").getAsInt();
+        int vnd = jo.get("vnd").getAsInt();
 
         String str = "1 " + coin + " = $" +
                 NumberFormat.getInstance(new Locale("en", "US")).format(usd) +
