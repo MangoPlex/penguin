@@ -9,5 +9,9 @@ public abstract class Command {
     public CommandData applicationCommandData = null;
     public List<Precondition> preconditions = List.of();
 
+    public Command(CommandData applicationCommandData) {
+        this.applicationCommandData = applicationCommandData;
+    }
+
     public abstract void run(SlashCommandInteraction interaction);
 }

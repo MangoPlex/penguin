@@ -13,8 +13,10 @@ import java.io.InputStreamReader;
 
 public class PingCommand extends Command {
     public PingCommand() {
-        this.applicationCommandData = Commands.slash("ping", "Ping a domain or ip")
-                .addOption(OptionType.STRING, "ip", "Provide an ip or domain", true);
+        super(
+                Commands.slash("ping", "Ping a domain or ip")
+                        .addOption(OptionType.STRING, "ip", "Provide an ip or domain", true)
+        );
     }
 
     @Override
