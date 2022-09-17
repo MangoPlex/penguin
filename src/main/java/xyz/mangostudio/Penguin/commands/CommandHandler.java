@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import xyz.mangostudio.Penguin.commands.crypto.CoinCommand;
 import xyz.mangostudio.Penguin.commands.info.PingCommand;
 import xyz.mangostudio.Penguin.structures.Command;
+import xyz.mangostudio.Penguin.structures.Precondition;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -41,9 +42,9 @@ public class CommandHandler {
         }
 
         if (!cmd.preconditions.isEmpty()) {
-            cmd.preconditions.forEach((precondition) -> {
-                precondition.run(event.getInteraction());
-            });
+            for (Precondition precondition : cmd.preconditions) {
+                if (!precondition.run(event.getInteraction())) return;
+            }
         }
 
         cmd.run(event.getInteraction());
