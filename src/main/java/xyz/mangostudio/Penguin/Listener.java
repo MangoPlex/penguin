@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xyz.mangostudio.Penguin.commands.CommandHandler;
+import xyz.mangostudio.Penguin.economy.Economy;
 import xyz.mangostudio.Penguin.utils.Constants;
 
 import java.util.ArrayList;
@@ -28,6 +29,8 @@ public class Listener extends ListenerAdapter {
     @Override
     public void onReady(@NotNull ReadyEvent event) {
         super.onReady(event);
+
+        new Economy(event.getJDA()).handle();
 
         event.getJDA().updateCommands().addCommands(
                 commandHandler.commands.stream().map(
