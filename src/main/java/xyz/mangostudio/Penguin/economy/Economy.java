@@ -6,11 +6,10 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import xyz.mangostudio.Penguin.db.DbClient;
 import xyz.mangostudio.Penguin.db.models.PUser;
-import xyz.mangostudio.Penguin.economy.structures.Inventory;
 import xyz.mangostudio.Penguin.economy.structures.Miner;
 import xyz.mangostudio.Penguin.utils.Constants;
+import xyz.mangostudio.Penguin.utils.Misc;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -38,23 +37,7 @@ public class Economy {
                             .toList();
 
                     if (users.isEmpty()) {
-                        ds.save(new PUser(
-                                member.getId(),
-                                0,
-                                new Inventory(
-                                        1,
-                                        new ArrayList<>(),
-                                        10,
-                                        0
-                                ),
-                                new Miner(
-                                        1,
-                                        10,
-                                        50,
-                                        0,
-                                        10
-                                )
-                        ));
+                        ds.save(Misc.getDefaultSetting(member.getId()));
                     }
                 }
         );

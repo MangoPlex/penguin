@@ -2,11 +2,15 @@ package xyz.mangostudio.Penguin.utils;
 
 import com.google.gson.Gson;
 import okhttp3.OkHttpClient;
+import xyz.mangostudio.Penguin.db.models.PUser;
 import xyz.mangostudio.Penguin.economy.EconomyUtils;
+import xyz.mangostudio.Penguin.economy.structures.Inventory;
+import xyz.mangostudio.Penguin.economy.structures.Miner;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 public class Misc {
@@ -19,6 +23,26 @@ public class Misc {
 
     public static OkHttpClient getOkHttpClient() {
         return OK_HTTP_CLIENT;
+    }
+
+    public static PUser getDefaultSetting(String uid) {
+        return new PUser(
+                uid,
+                0,
+                new Inventory(
+                        1,
+                        new ArrayList<>(),
+                        10,
+                        0
+                ),
+                new Miner(
+                        1,
+                        10,
+                        50,
+                        0,
+                        10
+                )
+        );
     }
 
     public static String readJsonResource(String fileName) {
