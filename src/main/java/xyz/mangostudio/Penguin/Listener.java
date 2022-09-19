@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceMoveEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -58,6 +59,7 @@ public class Listener extends ListenerAdapter {
                 stage.requestToSpeak().queue();
             }
         }
+        LOGGER.debug(event.getChannelJoined().getId());
         if (Constants.VOICE_PARENTS.equalsIgnoreCase(event.getChannelJoined().getId())) {
             String channelName = event.getMember().getEffectiveName() + "'s lounge";
             Category parent = event.getGuild().getCategoryById(Constants.PARENT_CATEGORY);
@@ -79,6 +81,33 @@ public class Listener extends ListenerAdapter {
         if (CHANNELS.contains(leftChannel.getId()) && memSize == 0) {
             try {
                 event.getGuild().getVoiceChannelById(leftChannel.getId()).delete().queue();
+                CHANNELS.remove(leftChannel.getId());
+            } catch (Exception ignored) {
+            }
+        }
+    }
+
+    @Override
+    public void onGuildVoiceMove(@NotNull GuildVoiceMoveEvent event) {
+        super.onGuildVoiceMove(event);
+        if (Constants.VOICE_PARENTS.equalsIgnoreCase(event.getChannelJoined().getId())) {
+            String channelName = event.getMember().getEffectiveName() + "'s lounge";
+            Category parent = event.getGuild().getCategoryById(Constants.PARENT_CATEGORY);
+
+            VoiceChannel channel = event.getGuild().createVoiceChannel(
+                    channelName, parent
+            ).complete();
+
+            event.getGuild().moveVoiceMember(event.getMember(), channel).queue();
+            CHANNELS.add(channel.getId());
+            return;
+        }
+        AudioChannel leftChannel = event.getChannelLeft();
+        int memSize = leftChannel.getMembers().size();
+        if (CHANNELS.contains(leftChannel.getId()) && memSize == 0) {
+            try {
+                event.getGuild().getVoiceChannelById(leftChannel.getId()).delete().queue();
+                CHANNELS.remove(leftChannel.getId());
             } catch (Exception ignored) {
             }
         }
