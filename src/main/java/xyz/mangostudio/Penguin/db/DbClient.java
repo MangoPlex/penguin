@@ -33,8 +33,8 @@ public class DbClient {
                 ),
                 Config.getConfig("DATABASE_NAME")
         );
-        datastore.ensureIndexes();
         datastore.getMapper().mapPackage("xyz.mangostudio.Penguin.db.models");
+        datastore.ensureIndexes();
     }
 
     public static Datastore getDatastore() {

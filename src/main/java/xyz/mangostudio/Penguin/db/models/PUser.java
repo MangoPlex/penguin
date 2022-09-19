@@ -8,15 +8,20 @@ import xyz.mangostudio.Penguin.economy.structures.Miner;
 @Entity("PUsers")
 public class PUser {
     @Id
-    private final String uid;
+    private String uid;
     private Inventory inventory;
     private Miner miner;
     private int balance;
 
+    public PUser() {
+    }
+
     public PUser(
             String uid,
             int balance,
-            Inventory inventory, Miner miner) {
+            Inventory inventory,
+            Miner miner
+    ) {
         this.uid = uid;
         this.balance = balance;
         this.inventory = inventory;
