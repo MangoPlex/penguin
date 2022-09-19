@@ -1,24 +1,40 @@
 package xyz.mangostudio.Penguin.db;
 
-import com.mongodb.MongoClient;
+import com.mongodb.ConnectionString;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.client.MongoClients;
 import dev.morphia.Datastore;
 import dev.morphia.Morphia;
+import org.bson.codecs.configuration.CodecRegistries;
+import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.codecs.pojo.PojoCodecProvider;
 import xyz.mangostudio.Penguin.Config;
 
-public class DbClient extends Morphia {
+
+public class DbClient {
     private static Datastore datastore;
+    private static final CodecRegistry REGISTRY = CodecRegistries.fromRegistries(
+            MongoClientSettings.getDefaultCodecRegistry(),
+            CodecRegistries.fromProviders(
+                    PojoCodecProvider.builder().automatic(true).build()
+            )
+    );
+    private static final MongoClientSettings SETTINGS = MongoClientSettings.builder()
+            .applyConnectionString(
+                    new ConnectionString(Config.getConfig("DATABASE_URL"))
+            )
+            .codecRegistry(REGISTRY)
+            .build();
 
     public DbClient() {
-        super();
-        this.mapPackage("xyz.mangostudio.Penguin");
-        datastore = this.createDatastore(
-                new MongoClient(
-                        Config.getConfig("DATABASE_HOST"),
-                        Integer.parseInt(Config.getConfig("DATABASE_PORT"))
+        datastore = Morphia.createDatastore(
+                MongoClients.create(
+                        SETTINGS
                 ),
                 Config.getConfig("DATABASE_NAME")
         );
         datastore.ensureIndexes();
+        datastore.getMapper().mapPackage("xyz.mangostudio.Penguin.db.models");
     }
 
     public static Datastore getDatastore() {
