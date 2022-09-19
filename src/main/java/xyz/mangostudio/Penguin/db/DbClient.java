@@ -12,7 +12,10 @@ public class DbClient extends Morphia {
         super();
         this.mapPackage("xyz.mangostudio.Penguin");
         datastore = this.createDatastore(
-                new MongoClient(Config.getConfig("DATABASE_URL")),
+                new MongoClient(
+                        Config.getConfig("DATABASE_HOST"),
+                        Integer.parseInt(Config.getConfig("DATABASE_PORT"))
+                ),
                 Config.getConfig("DATABASE_NAME")
         );
         datastore.ensureIndexes();
