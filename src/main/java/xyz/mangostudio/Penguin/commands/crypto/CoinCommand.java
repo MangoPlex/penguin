@@ -52,7 +52,7 @@ public class CoinCommand extends Command {
 
             embed.addField(
                     ((char) (entry.getKey().charAt(0) - 32)) + entry.getKey().substring(1),
-                    "Price per unit: $" + usd + "(" + vnd + "₫)",
+                    "Price per unit: $" + usd + " (" + vnd + "₫)",
                     false
             );
         }
