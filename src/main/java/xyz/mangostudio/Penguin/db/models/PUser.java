@@ -5,7 +5,7 @@ import dev.morphia.annotations.Id;
 import xyz.mangostudio.Penguin.economy.structures.Inventory;
 import xyz.mangostudio.Penguin.economy.structures.Miner;
 
-@Entity("PUser")
+@Entity("PUsers")
 public class PUser {
     @Id
     private final String uid;
