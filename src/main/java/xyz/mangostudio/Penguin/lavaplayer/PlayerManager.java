@@ -7,7 +7,10 @@ import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
 
 import java.util.HashMap;
@@ -29,6 +32,61 @@ public class PlayerManager {
         if (INSTANCE == null)
             INSTANCE = new PlayerManager();
         return INSTANCE;
+    }
+
+    public void loadAndPlay(InteractionHook hook, String trackUrl, User requester) {
+        GuildMusicManager musicManager = this.getMusicManager(hook.getInteraction().getGuild());
+        this.audioPlayerManager.loadItemOrdered(musicManager, trackUrl, new AudioLoadResultHandler() {
+            @Override
+            public void trackLoaded(AudioTrack track) {
+                track.setUserData(requester.getId());
+                musicManager.getScheduler().enqueue(track);
+                hook.editOriginalEmbeds(
+                        new EmbedBuilder()
+                                .setDescription("Added **" + track.getInfo().title + "** to the queue")
+                                .build()
+                ).queue();
+            }
+
+            @Override
+            public void playlistLoaded(AudioPlaylist playlist) {
+                if (trackUrl.startsWith("ytsearch:")) {
+                    AudioTrack track = playlist.getTracks().get(0);
+                    this.trackLoaded(track);
+                    return;
+                }
+
+                for (AudioTrack track : playlist.getTracks()) {
+                    track.setUserData(requester.getAsTag());
+                    musicManager.getScheduler().enqueue(track);
+                }
+
+                hook.editOriginalEmbeds(
+                        new EmbedBuilder()
+                                .setDescription("Added playlist**" + playlist.getName() + "** to the queue")
+                                .build()
+                ).queue();
+            }
+
+            @Override
+            public void noMatches() {
+                hook.editOriginalEmbeds(
+                        new EmbedBuilder()
+                                .setDescription("Not found")
+                                .build()
+                ).queue();
+            }
+
+            @Override
+            public void loadFailed(FriendlyException exception) {
+                hook.editOriginalEmbeds(
+                        new EmbedBuilder()
+                                .setDescription("Load failed")
+                                .build()
+                ).queue();
+                exception.printStackTrace();
+            }
+        });
     }
 
     public GuildMusicManager getMusicManager(Guild guild) {
