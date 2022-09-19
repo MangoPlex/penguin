@@ -2,6 +2,7 @@ package xyz.mangostudio.Penguin.utils;
 
 import com.google.gson.Gson;
 import okhttp3.OkHttpClient;
+import xyz.mangostudio.Penguin.economy.EconomyUtils;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
