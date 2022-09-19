@@ -1,8 +1,11 @@
 package xyz.mangostudio.Penguin.economy.structures;
 
 public class Item {
-    private final String id;
-    private final String name;
+    private String id;
+    private String name;
+
+    public Item() {
+    }
 
     public Item(
             String id,

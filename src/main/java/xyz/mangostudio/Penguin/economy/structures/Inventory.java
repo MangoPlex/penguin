@@ -3,10 +3,13 @@ package xyz.mangostudio.Penguin.economy.structures;
 import java.util.List;
 
 public class Inventory {
-    private final int tier;
+    private int tier;
     private List<Item> items;
-    private final int maxCapacity;
-    private final int used;
+    private int maxCapacity;
+    private int used;
+
+    public Inventory() {
+    }
 
     public Inventory(int tier, List<Item> items, int maxCapacity, int used) {
         this.tier = tier;

@@ -1,6 +1,7 @@
 package xyz.mangostudio.Penguin;
 
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
+import net.dv8tion.jda.api.entities.channel.concrete.StageChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.events.ReadyEvent;
@@ -9,6 +10,7 @@ import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.managers.AudioManager;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +46,15 @@ public class Listener extends ListenerAdapter {
     @Override
     public void onGuildVoiceJoin(@NotNull GuildVoiceJoinEvent event) {
         super.onGuildVoiceJoin(event);
+        if (event.getMember().getId().equalsIgnoreCase(event.getJDA().getSelfUser().getId())) {
+            AudioManager man = event.getGuild().getAudioManager();
+            AudioChannel channel = event.getChannelJoined();
+
+            if (!man.isSelfDeafened()) man.setSelfDeafened(true);
+            if (channel instanceof StageChannel stage) {
+                stage.requestToSpeak().queue();
+            }
+        }
         if (Constants.VOICE_PARENTS.equalsIgnoreCase(event.getChannelJoined().getId())) {
             String channelName = event.getMember().getEffectiveName() + "'s lounge";
             Category parent = event.getGuild().getCategoryById(Constants.PARENT_CATEGORY);
