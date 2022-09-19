@@ -6,7 +6,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import dev.morphia.Datastore;
 import dev.morphia.query.Query;
-import dev.morphia.query.UpdateOperations;
+import dev.morphia.query.experimental.filters.Filters;
+import dev.morphia.query.experimental.updates.UpdateOperators;
 import xyz.mangostudio.Penguin.db.DbClient;
 import xyz.mangostudio.Penguin.db.models.PUser;
 import xyz.mangostudio.Penguin.economy.structures.Inventory;
@@ -36,10 +37,9 @@ public class EconomyUtils {
 
     public static UpgradeStatus upgradeInventory(String uid, int tier) {
         Datastore ds = DbClient.getDatastore();
-        Query<PUser> userQuery = ds.createQuery(PUser.class)
-                .field("uid")
-                .equalIgnoreCase(uid);
-        List<PUser> users = userQuery.find().toList();
+        Query<PUser> userQuery = ds.find(PUser.class)
+                .filter(Filters.eq("uid", uid));
+        List<PUser> users = userQuery.stream().toList();
 
         if (users.isEmpty()) return UpgradeStatus.NOT_FOUND;
         PUser user = users.get(0);
@@ -65,19 +65,18 @@ public class EconomyUtils {
         inventory.setItems(userItems);
         user.setInventory(inventory);
 
-        UpdateOperations<PUser> operations = ds.createUpdateOperations(PUser.class)
-                .set("inventory", inventory);
-        ds.update(userQuery, operations);
+        userQuery.update(
+                UpdateOperators.set("inventory", inventory)
+        ).execute();
 
         return UpgradeStatus.SUCCESS;
     }
 
     public static UpgradeStatus upgradeMiner(String uid, int tier) {
         Datastore ds = DbClient.getDatastore();
-        Query<PUser> userQuery = ds.createQuery(PUser.class)
-                .field("uid")
-                .equalIgnoreCase(uid);
-        List<PUser> users = userQuery.find().toList();
+        Query<PUser> userQuery = ds.find(PUser.class)
+                .filter(Filters.eq("uid", uid));
+        List<PUser> users = userQuery.stream().toList();
 
         if (users.isEmpty()) return UpgradeStatus.NOT_FOUND;
         PUser user = users.get(0);
@@ -100,10 +99,9 @@ public class EconomyUtils {
         user.subtractBalance(price);
         Miner miner = Misc.getGSON().fromJson(jsonMiner, Miner.class);
 
-        UpdateOperations<PUser> operations = ds.createUpdateOperations(PUser.class)
-                .set("miner", miner);
-
-        ds.update(userQuery, operations);
+        userQuery.update(
+                UpdateOperators.set("miner", miner)
+        ).execute();
 
         return UpgradeStatus.SUCCESS;
     }

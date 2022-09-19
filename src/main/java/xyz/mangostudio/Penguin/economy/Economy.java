@@ -1,6 +1,7 @@
 package xyz.mangostudio.Penguin.economy;
 
 import dev.morphia.Datastore;
+import dev.morphia.query.experimental.filters.Filters;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import xyz.mangostudio.Penguin.db.DbClient;
@@ -31,10 +32,9 @@ public class Economy {
                 (member) -> {
                     Datastore ds = DbClient.getDatastore();
 
-                    List<PUser> users = ds.createQuery(PUser.class)
-                            .field("uid")
-                            .equalIgnoreCase(member.getId())
-                            .find()
+                    List<PUser> users = ds.find(PUser.class)
+                            .filter(Filters.eq("uid", member.getId()))
+                            .stream()
                             .toList();
 
                     if (users.isEmpty()) {
@@ -63,7 +63,7 @@ public class Economy {
             @Override
             public void run() {
                 Datastore ds = DbClient.getDatastore();
-                List<PUser> allUsers = ds.createQuery(PUser.class).find().toList();
+                List<PUser> allUsers = ds.find(PUser.class).stream().toList();
 
                 for (PUser user : allUsers) {
                     Miner miner = user.getMiner();
