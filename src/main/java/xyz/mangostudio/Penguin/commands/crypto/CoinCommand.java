@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import xyz.mangostudio.Penguin.structures.Command;
 import xyz.mangostudio.Penguin.utils.CryptoUtils;
+import xyz.mangostudio.Penguin.utils.Misc;
 
 import java.text.NumberFormat;
 import java.util.Date;
@@ -37,7 +38,7 @@ public class CoinCommand extends Command {
             return;
         }
 
-        Gson gson = new Gson();
+        Gson gson = Misc.getGSON();
         JsonObject jo = gson.fromJson(coinPriceData, JsonObject.class);
         EmbedBuilder embed = new EmbedBuilder()
                 .setTitle("Coin price")

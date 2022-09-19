@@ -12,14 +12,14 @@ import java.util.Arrays;
 import java.util.List;
 
 public class CryptoUtils {
-    private static final OkHttpClient CLIENT = new OkHttpClient();
+    private static final OkHttpClient CLIENT = Misc.getOkHttpClient();
     private static final List<CoinData> COIN_DATA_LIST = new ArrayList<>();
 
     static {
         Request request = new Request.Builder()
                 .url("https://api.coingecko.com/api/v3/coins/list")
                 .build();
-        Gson gson = new Gson();
+        Gson gson = Misc.getGSON();
         try (Response response = CLIENT.newCall(request).execute()) {
             JsonArray array = gson.fromJson(response.body().string(), JsonArray.class);
             array.forEach((e) -> COIN_DATA_LIST.add(gson.fromJson(e, CoinData.class)));
