@@ -9,8 +9,8 @@ import xyz.mangostudio.Penguin.economy.structures.Miner;
 public class PUser {
     @Id
     private final String uid;
-    private final Inventory inventory;
-    private final Miner miner;
+    private Inventory inventory;
+    private Miner miner;
     private int balance;
 
     public PUser(
@@ -35,19 +35,27 @@ public class PUser {
         this.balance = balance;
     }
 
+    public void subtractBalance(int amount) {
+        this.balance -= amount;
+    }
+
+    public void addBalance(int amount) {
+        this.balance += amount;
+    }
+
     public Inventory getInventory() {
         return inventory;
     }
 
-    public void upgradeInventory(int tier) {
-
+    public void setInventory(Inventory inventory) {
+        this.inventory = inventory;
     }
 
     public Miner getMiner() {
         return miner;
     }
 
-    public void upgradeMiner(int tier) {
-
+    public void setMiner(Miner miner) {
+        this.miner = miner;
     }
 }
