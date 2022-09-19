@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import xyz.mangostudio.Penguin.commands.crypto.CoinCommand;
 import xyz.mangostudio.Penguin.commands.info.PingCommand;
+import xyz.mangostudio.Penguin.commands.music.PlayCommand;
 import xyz.mangostudio.Penguin.structures.Command;
 import xyz.mangostudio.Penguin.structures.Precondition;
 
@@ -15,8 +16,11 @@ public class CommandHandler {
     public final List<Command> commands = new ArrayList<>();
 
     public CommandHandler() {
-        addCommand(new PingCommand());
-        addCommand(new CoinCommand());
+        addCommand(
+                new PingCommand(),
+                new CoinCommand(),
+                new PlayCommand()
+        );
     }
 
     private void addCommand(Command... cmd) {
