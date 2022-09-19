@@ -70,7 +70,7 @@ public class Economy {
                     double rand = Math.floor(Math.random() * 100);
 
                     if (rand <= miner.getSuccessRate()) {
-                        user.setBalance(user.getBalance() + miner.getMoneyRate());
+                        user.addBalance(miner.getMoneyRate());
                         user.getMiner().setDurability(user.getMiner().getDurability() - 1);
 
                         ds.save(user);
