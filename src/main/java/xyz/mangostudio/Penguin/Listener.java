@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.StageChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -15,8 +16,10 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xyz.mangostudio.Penguin.commands.CommandHandler;
+import xyz.mangostudio.Penguin.db.DbClient;
 import xyz.mangostudio.Penguin.economy.Economy;
 import xyz.mangostudio.Penguin.utils.Constants;
+import xyz.mangostudio.Penguin.utils.Misc;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,5 +94,13 @@ public class Listener extends ListenerAdapter {
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
         super.onButtonInteraction(event);
 
+    }
+
+    @Override
+    public void onGuildMemberJoin(@NotNull GuildMemberJoinEvent event) {
+        super.onGuildMemberJoin(event);
+        if (event.getUser().isBot()) {
+            DbClient.getDatastore().save(Misc.getDefaultSetting(event.getUser().getId()));
+        }
     }
 }
