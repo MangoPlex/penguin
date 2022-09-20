@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import xyz.mangostudio.penguin.structures.Command;
+import xyz.mangostudio.penguin.structures.Entities;
 import xyz.mangostudio.penguin.utils.CryptoUtils;
 import xyz.mangostudio.penguin.utils.Misc;
 
@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class CoinCommand extends Command {
+public class CoinCommand extends Entities.Command {
     public CoinCommand() {
         super(
                 Commands.slash("coin", "Get price of the cryptocurrency")

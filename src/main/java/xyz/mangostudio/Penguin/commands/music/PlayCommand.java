@@ -8,12 +8,12 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import xyz.mangostudio.penguin.lavaplayer.PlayerManager;
-import xyz.mangostudio.penguin.structures.Command;
+import xyz.mangostudio.penguin.structures.Entities;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class PlayCommand extends Command {
+public class PlayCommand extends Entities.Command {
     public PlayCommand() {
         super(
                 Commands.slash("play", "Play music")

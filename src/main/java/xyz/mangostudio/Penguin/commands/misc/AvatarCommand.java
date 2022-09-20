@@ -5,9 +5,9 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import xyz.mangostudio.penguin.structures.Command;
+import xyz.mangostudio.penguin.structures.Entities;
 
-public class AvatarCommand extends Command {
+public class AvatarCommand extends Entities.Command {
     public AvatarCommand() {
         super(
                 Commands.slash("avatar", "Check user's avatar")

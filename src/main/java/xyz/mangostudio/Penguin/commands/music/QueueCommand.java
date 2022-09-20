@@ -9,11 +9,11 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.collections4.ListUtils;
 import xyz.mangostudio.penguin.lavaplayer.PlayerManager;
 import xyz.mangostudio.penguin.preconditions.MusicPrecondition;
-import xyz.mangostudio.penguin.structures.Command;
+import xyz.mangostudio.penguin.structures.Entities;
 
 import java.util.List;
 
-public class QueueCommand extends Command {
+public class QueueCommand extends Entities.Command {
     public QueueCommand() {
         super(Commands.slash("queue", "View the queue"));
         this.preconditions = List.of(new MusicPrecondition());
@@ -39,7 +39,7 @@ public class QueueCommand extends Command {
         List<AudioTrack> chosen = divQueue.get(0);
         EmbedBuilder embed = new EmbedBuilder()
                 .setTitle("Queue")
-                .setDescription("Page: 1/" + chosen.size());
+                .setDescription("Page: 1/" + divQueue.size());
 
         chosen.forEach((track) -> {
             Member member = interaction.getGuild().getMemberById(track.getUserData(String.class));

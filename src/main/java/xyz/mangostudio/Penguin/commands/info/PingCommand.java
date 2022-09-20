@@ -4,14 +4,14 @@ import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import xyz.mangostudio.penguin.structures.Command;
+import xyz.mangostudio.penguin.structures.Entities;
 import xyz.mangostudio.penguin.utils.OSUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class PingCommand extends Command {
+public class PingCommand extends Entities.Command {
     public PingCommand() {
         super(
                 Commands.slash("ping", "Ping a domain or ip")

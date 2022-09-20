@@ -3,9 +3,9 @@ package xyz.mangostudio.penguin.commands.misc;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import xyz.mangostudio.penguin.structures.Command;
+import xyz.mangostudio.penguin.structures.Entities;
 
-public class RollCommand extends Command {
+public class RollCommand extends Entities.Command {
     public RollCommand() {
         super(
                 Commands.slash("roll", "Roll a random number")
@@ -13,6 +13,7 @@ public class RollCommand extends Command {
                         .addOption(OptionType.INTEGER, "max", "The maximum number to roll", false)
         );
     }
+
     @Override
     public void run(SlashCommandInteraction interaction) {
         int min = interaction.getOption("min") == null ? 1 : interaction.getOption("min").getAsInt();

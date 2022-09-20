@@ -1,14 +1,14 @@
-package xyz.mangostudio.Penguin.economy;
+package xyz.mangostudio.penguin.economy;
 
 import dev.morphia.Datastore;
 import dev.morphia.query.experimental.filters.Filters;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
-import xyz.mangostudio.Penguin.db.DbClient;
-import xyz.mangostudio.Penguin.db.models.PUser;
-import xyz.mangostudio.Penguin.economy.structures.Miner;
-import xyz.mangostudio.Penguin.utils.Constants;
-import xyz.mangostudio.Penguin.utils.Misc;
+import xyz.mangostudio.penguin.db.DbClient;
+import xyz.mangostudio.penguin.db.models.PUser;
+import xyz.mangostudio.penguin.economy.structures.Miner;
+import xyz.mangostudio.penguin.utils.Constants;
+import xyz.mangostudio.penguin.utils.Misc;
 
 import java.util.List;
 import java.util.Timer;
