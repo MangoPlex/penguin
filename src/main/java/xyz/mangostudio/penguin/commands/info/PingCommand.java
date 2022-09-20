@@ -26,7 +26,7 @@ public class PingCommand extends Entities.Command {
 
         if (OSUtils.isWindows())
             processBuilder.command("cmd.exe", "/c", "ping", interaction.getOption("ip").getAsString());
-        else processBuilder.command("bash", "-c", "ping", interaction.getOption("ip").getAsString());
+        else processBuilder.command("bash", "-c", "\"ping", interaction.getOption("ip").getAsString() + "\"");
         try {
             Process process = processBuilder.start();
             StringBuilder output = new StringBuilder();
