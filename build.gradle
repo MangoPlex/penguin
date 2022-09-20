@@ -6,7 +6,7 @@ plugins {
 
 group "xyz.mangostudio"
 version "1.0.0"
-mainClassName = "xyz.mangostudio.penguin.Main"
+mainClassName = "xyz.mangostudio.Penguin.Main"
 compileJava.options.encoding = "UTF-8"
 compileTestJava.options.encoding = "UTF-8"
 sourceCompatibility = 16
