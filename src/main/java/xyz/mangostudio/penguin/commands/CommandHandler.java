@@ -8,6 +8,7 @@ import xyz.mangostudio.penguin.commands.misc.AvatarCommand;
 import xyz.mangostudio.penguin.commands.misc.RollCommand;
 import xyz.mangostudio.penguin.commands.music.PlayCommand;
 import xyz.mangostudio.penguin.commands.music.QueueCommand;
+import xyz.mangostudio.penguin.commands.music.SkipCommand;
 import xyz.mangostudio.penguin.structures.Entities;
 import xyz.mangostudio.penguin.structures.Handler;
 
@@ -20,7 +21,8 @@ public class CommandHandler extends Handler<Entities.Command> {
                 new PlayCommand(),
                 new AvatarCommand(),
                 new RollCommand(),
-                new QueueCommand()
+                new QueueCommand(),
+                new SkipCommand()
         );
     }
 
