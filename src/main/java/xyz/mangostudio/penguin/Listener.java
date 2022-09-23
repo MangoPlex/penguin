@@ -20,6 +20,7 @@ import xyz.mangostudio.penguin.buttons.ButtonHandler;
 import xyz.mangostudio.penguin.commands.CommandHandler;
 import xyz.mangostudio.penguin.db.DbClient;
 import xyz.mangostudio.penguin.economy.Economy;
+import xyz.mangostudio.penguin.lavaplayer.PlayerManager;
 import xyz.mangostudio.penguin.structures.Entities;
 import xyz.mangostudio.penguin.utils.Constants;
 import xyz.mangostudio.penguin.utils.Misc;
@@ -79,12 +80,27 @@ public class Listener extends ListenerAdapter {
     public void onGuildVoiceLeave(@NotNull GuildVoiceLeaveEvent event) {
         super.onGuildVoiceLeave(event);
         AudioChannel leftChannel = event.getChannelLeft();
-        int memSize = leftChannel.getMembers().size();
+        long memSize = leftChannel.getMembers().size();
         if (CHANNELS.contains(leftChannel.getId()) && memSize == 0) {
             try {
                 event.getGuild().getVoiceChannelById(leftChannel.getId()).delete().queue();
                 CHANNELS.remove(leftChannel.getId());
             } catch (Exception ignored) {
+            }
+        }
+
+        if (leftChannel.getMembers().contains(event.getGuild().getSelfMember())) {
+            if (leftChannel.getMembers().equals(event.getGuild().getSelfMember())) {
+                PlayerManager.getInstance().getMusicManager(event.getGuild()).getAudioPlayer().destroy();
+                return;
+            }
+
+            memSize = leftChannel.getMembers().stream().filter(
+                    (m) -> !m.getUser().isBot()
+            ).count();
+
+            if (memSize == 0) {
+                event.getGuild().getAudioManager().closeAudioConnection();
             }
         }
     }
