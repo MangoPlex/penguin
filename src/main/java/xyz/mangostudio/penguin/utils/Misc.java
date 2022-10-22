@@ -5,7 +5,6 @@ import okhttp3.OkHttpClient;
 import xyz.mangostudio.penguin.db.models.PUser;
 import xyz.mangostudio.penguin.economy.EconomyUtils;
 import xyz.mangostudio.penguin.economy.structures.Inventory;
-import xyz.mangostudio.penguin.economy.structures.Miner;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -30,17 +29,11 @@ public class Misc {
                 uid,
                 0,
                 new Inventory(
+                        uid,
                         1,
                         new ArrayList<>(),
                         10,
                         0
-                ),
-                new Miner(
-                        1,
-                        10,
-                        50,
-                        0,
-                        10
                 )
         );
     }
