@@ -25,7 +25,7 @@ public class SetBalanceCommand extends Entities.Command {
                 Commands.slash("setbalance", "Set balance of a user")
                         .addOptions(
                                 new OptionData(OptionType.USER, "user", "User to view balance", true),
-                                new OptionData(OptionType.INTEGER, "amount", "Amount to set", true),
+                                new OptionData(OptionType.NUMBER, "amount", "Amount to set", true),
                                 new OptionData(OptionType.STRING, "operation", "Action to take on user's balance", true)
                                         .addChoices(
                                                 new Command.Choice("add", "add"),
@@ -61,7 +61,7 @@ public class SetBalanceCommand extends Entities.Command {
             return;
         }
 
-        int amount = interaction.getOption("amount").getAsInt();
+        double amount = interaction.getOption("amount").getAsDouble();
 
         Query<PUser> userQuery = DbClient.getDatastore().find(PUser.class)
                 .filter(Filters.eq("uid", user.getId()));

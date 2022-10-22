@@ -27,7 +27,7 @@ public class Misc {
     public static PUser getDefaultSetting(String uid) {
         return new PUser(
                 uid,
-                0,
+                0D,
                 new Inventory(
                         uid,
                         1,
