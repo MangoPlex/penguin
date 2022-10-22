@@ -41,7 +41,7 @@ public class PUser {
                 .filter(Filters.eq("uid", uid))
                 .update(
                         UpdateOperators.set("balance", this.balance)
-                );
+                ).execute();
     }
 
     public void subtractBalance(int amount) {
@@ -62,6 +62,6 @@ public class PUser {
                 .filter(Filters.eq("uid", uid))
                 .update(
                         UpdateOperators.set("inventory", this.balance)
-                );
+                ).execute();
     }
 }
