@@ -6,13 +6,10 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import xyz.mangostudio.penguin.db.DbClient;
 import xyz.mangostudio.penguin.db.models.PUser;
-import xyz.mangostudio.penguin.economy.structures.Miner;
 import xyz.mangostudio.penguin.utils.Constants;
 import xyz.mangostudio.penguin.utils.Misc;
 
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class Economy {
     private final JDA jda;
@@ -41,25 +38,5 @@ public class Economy {
                     }
                 }
         );
-
-        new Timer().scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                Datastore ds = DbClient.getDatastore();
-                List<PUser> allUsers = ds.find(PUser.class).stream().toList();
-
-                for (PUser user : allUsers) {
-                    Miner miner = user.getMiner();
-                    double rand = Math.floor(Math.random() * 100);
-
-                    if (rand <= miner.getSuccessRate()) {
-                        user.addBalance(miner.getMoneyRate());
-                        user.getMiner().setDurability(user.getMiner().getDurability() - 1);
-
-                        ds.save(user);
-                    }
-                }
-            }
-        }, 0, 60 * 60 * 1000);
     }
 }

@@ -1,5 +1,10 @@
 [
   {
-    "tier": 1
+    "tier": 1,
+    "maxCapacity": 100
+  },
+  {
+    "tier": 2,
+    "maxCapacity": 100
   }
 ]
