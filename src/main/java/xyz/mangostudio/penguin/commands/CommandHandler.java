@@ -3,6 +3,8 @@ package xyz.mangostudio.penguin.commands;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import xyz.mangostudio.penguin.commands.crypto.CoinCommand;
+import xyz.mangostudio.penguin.commands.economy.BalanceCommand;
+import xyz.mangostudio.penguin.commands.economy.SetBalanceCommand;
 import xyz.mangostudio.penguin.commands.info.PingCommand;
 import xyz.mangostudio.penguin.commands.misc.AvatarCommand;
 import xyz.mangostudio.penguin.commands.misc.RollCommand;
@@ -22,7 +24,9 @@ public class CommandHandler extends Handler<Entities.Command> {
                 new AvatarCommand(),
                 new RollCommand(),
                 new QueueCommand(),
-                new SkipCommand()
+                new SkipCommand(),
+                new BalanceCommand(),
+                new SetBalanceCommand()
         );
     }
 
