@@ -90,7 +90,7 @@ public class Listener extends ListenerAdapter {
         }
 
         if (leftChannel.getMembers().contains(event.getGuild().getSelfMember())) {
-            if (leftChannel.getMembers().equals(event.getGuild().getSelfMember())) {
+            if (event.getMember().equals(event.getGuild().getSelfMember())) {
                 PlayerManager.getInstance().getMusicManager(event.getGuild()).getAudioPlayer().destroy();
                 return;
             }
