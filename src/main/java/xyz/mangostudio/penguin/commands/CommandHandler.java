@@ -8,6 +8,7 @@ import xyz.mangostudio.penguin.commands.economy.SetBalanceCommand;
 import xyz.mangostudio.penguin.commands.info.PingCommand;
 import xyz.mangostudio.penguin.commands.misc.AvatarCommand;
 import xyz.mangostudio.penguin.commands.misc.RollCommand;
+import xyz.mangostudio.penguin.commands.music.ClearCommand;
 import xyz.mangostudio.penguin.commands.music.PlayCommand;
 import xyz.mangostudio.penguin.commands.music.QueueCommand;
 import xyz.mangostudio.penguin.commands.music.SkipCommand;
@@ -26,7 +27,8 @@ public class CommandHandler extends Handler<Entities.Command> {
                 new QueueCommand(),
                 new SkipCommand(),
                 new BalanceCommand(),
-                new SetBalanceCommand()
+                new SetBalanceCommand(),
+                new ClearCommand()
         );
     }
 
