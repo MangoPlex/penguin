@@ -146,7 +146,7 @@ public class Listener extends ListenerAdapter {
     @Override
     public void onGuildMemberJoin(@NotNull GuildMemberJoinEvent event) {
         super.onGuildMemberJoin(event);
-        if (event.getUser().isBot()) {
+        if (!event.getUser().isBot()) {
             DbClient.getDatastore().save(Misc.getDefaultSetting(event.getUser().getId()));
         }
     }

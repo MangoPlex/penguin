@@ -35,7 +35,7 @@ public class BalanceCommand extends Entities.Command {
 
         List<PUser> users = userQuery.stream().toList();
 
-        int balance;
+        double balance;
         if (users.isEmpty()) {
             DbClient.getDatastore().insert(Misc.getDefaultSetting(user.getId()));
             balance = 0;

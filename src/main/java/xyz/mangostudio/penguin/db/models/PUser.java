@@ -12,14 +12,14 @@ public class PUser {
     @Id
     private String uid;
     private Inventory inventory;
-    private int balance;
+    private double balance;
 
     public PUser() {
     }
 
     public PUser(
             String uid,
-            int balance,
+            double balance,
             Inventory inventory
     ) {
         this.uid = uid;
@@ -31,11 +31,11 @@ public class PUser {
         return this.uid;
     }
 
-    public int getBalance() {
+    public double getBalance() {
         return this.balance;
     }
 
-    public void setBalance(int balance) {
+    public void setBalance(double balance) {
         this.balance = balance;
         DbClient.getDatastore().find(PUser.class)
                 .filter(Filters.eq("uid", uid))
@@ -44,11 +44,11 @@ public class PUser {
                 ).execute();
     }
 
-    public void subtractBalance(int amount) {
+    public void subtractBalance(double amount) {
         this.setBalance(this.balance - amount);
     }
 
-    public void addBalance(int amount) {
+    public void addBalance(double amount) {
         this.setBalance(this.balance + amount);
     }
 

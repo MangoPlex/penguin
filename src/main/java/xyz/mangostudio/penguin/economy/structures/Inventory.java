@@ -1,12 +1,9 @@
 package xyz.mangostudio.penguin.economy.structures;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import dev.morphia.query.Query;
 import dev.morphia.query.experimental.filters.Filters;
-import dev.morphia.query.experimental.updates.UpdateOperators;
 import xyz.mangostudio.penguin.db.DbClient;
 import xyz.mangostudio.penguin.db.models.PUser;
 import xyz.mangostudio.penguin.economy.EconomyUtils;
@@ -60,11 +57,11 @@ public class Inventory {
 
         if (jsonInv == null) return UpgradeStatus.MAXED_OUT;
 
-        int price = jsonInv.get("price").getAsInt();
+        double price = jsonInv.get("price").getAsInt();
 
         if (user.getBalance() - price < 0) return UpgradeStatus.NOT_ENOUGH_MONEY;
 
-        user.setBalance(price);
+        user.subtractBalance(price);
         List<Item> userItems = user.getInventory().getItems();
         Inventory inventory = Misc.getGSON().fromJson(jsonInv, Inventory.class);
         this.items = userItems;
