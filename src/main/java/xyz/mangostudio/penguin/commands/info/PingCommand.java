@@ -1,6 +1,8 @@
 package xyz.mangostudio.penguin.commands.info;
 
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.InteractionHook;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -14,8 +16,8 @@ import java.io.InputStreamReader;
 public class PingCommand extends Entities.Command {
     public PingCommand() {
         super(
-                Commands.slash("ping", "Ping a domain or ip")
-                        .addOption(OptionType.STRING, "ip", "Provide an ip or domain", true)
+                Commands.slash("ping", "Ping a domain or ip or check the ping between the bot and server")
+                        .addOption(OptionType.STRING, "ip", "Provide an ip or domain", false)
         );
     }
 
@@ -24,9 +26,20 @@ public class PingCommand extends Entities.Command {
         InteractionHook hook = interaction.deferReply().complete();
         ProcessBuilder processBuilder = new ProcessBuilder();
 
+        OptionMapping ip = interaction.getOption("ip");
+
+        if (ip == null) {
+            interaction.replyEmbeds(
+                    new EmbedBuilder()
+                            .setDescription("Ping: " + interaction.getJDA().getShardManager().getAverageGatewayPing() + "ms")
+                            .build()
+            ).queue();
+            return;
+        }
+
         if (OSUtils.isWindows())
-            processBuilder.command("cmd.exe", "/c", "ping", interaction.getOption("ip").getAsString());
-        else processBuilder.command("bash", "-c", "\"ping", interaction.getOption("ip").getAsString() + "\"");
+            processBuilder.command("cmd.exe", "/c", "ping", ip.getAsString());
+        else processBuilder.command("bash", "-c", "\"ping", ip.getAsString() + "\"");
         try {
             Process process = processBuilder.start();
             StringBuilder output = new StringBuilder();
