@@ -12,9 +12,6 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import xyz.mangostudio.penguin.db.DbClient;
 import xyz.mangostudio.penguin.db.models.PUser;
 import xyz.mangostudio.penguin.structures.Entities;
-import xyz.mangostudio.penguin.utils.Misc;
-
-import java.util.List;
 
 public class BalanceCommand extends Entities.Command {
     public BalanceCommand() {
@@ -33,18 +30,12 @@ public class BalanceCommand extends Entities.Command {
         Query<PUser> userQuery = DbClient.getDatastore().find(PUser.class)
                 .filter(Filters.eq("uid", user.getId()));
 
-        List<PUser> users = userQuery.stream().toList();
-
-        double balance;
-        if (users.isEmpty()) {
-            DbClient.getDatastore().insert(Misc.getDefaultSetting(user.getId()));
-            balance = 0;
-        } else balance = users.get(0).getBalance();
+        PUser pUser = userQuery.first();
 
         hook.editOriginalEmbeds(
                 new EmbedBuilder()
                         .setTitle("MangoCoin™️")
-                        .setDescription("Your balance: " + balance + "MGC")
+                        .setDescription("Your balance: " + pUser.getBalance() + "MGC")
                         .build()
         ).queue();
     }

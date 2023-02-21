@@ -6,6 +6,7 @@ import dev.morphia.query.experimental.filters.Filters;
 import dev.morphia.query.experimental.updates.UpdateOperators;
 import xyz.mangostudio.penguin.db.DbClient;
 import xyz.mangostudio.penguin.economy.structures.Inventory;
+import xyz.mangostudio.penguin.utils.Misc;
 
 @Entity("PUsers")
 public class PUser {
@@ -63,5 +64,15 @@ public class PUser {
                 .update(
                         UpdateOperators.set("inventory", this.balance)
                 ).execute();
+    }
+
+    public static PUser getUser(String id) {
+        PUser user = DbClient.getDatastore().find(PUser.class)
+                .filter(Filters.eq("uid", id)).first();
+        if (user == null) {
+            user = DbClient.getDatastore().save(Misc.getDefaultSetting(id));
+        }
+
+        return user;
     }
 }
