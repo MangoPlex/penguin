@@ -1,8 +1,5 @@
 package xyz.mangostudio.penguin.commands.economy;
 
-import dev.morphia.query.Query;
-import dev.morphia.query.experimental.filters.Filters;
-import dev.morphia.query.experimental.updates.UpdateOperators;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.InteractionHook;
@@ -11,13 +8,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import xyz.mangostudio.penguin.db.DbClient;
 import xyz.mangostudio.penguin.db.models.PUser;
 import xyz.mangostudio.penguin.structures.Entities;
 import xyz.mangostudio.penguin.utils.Constants;
-import xyz.mangostudio.penguin.utils.Misc;
-
-import java.util.List;
 
 public class SetBalanceCommand extends Entities.Command {
     public SetBalanceCommand() {
@@ -63,39 +56,23 @@ public class SetBalanceCommand extends Entities.Command {
 
         double amount = interaction.getOption("amount").getAsDouble();
 
-        Query<PUser> userQuery = DbClient.getDatastore().find(PUser.class)
-                .filter(Filters.eq("uid", user.getId()));
-
-        List<PUser> users = userQuery.stream().toList();
+        PUser pUser = PUser.getUser(user.getId());
 
         EmbedBuilder embed = new EmbedBuilder()
                 .setTitle("MangoCoin™️");
 
-        if (users.isEmpty()) {
-            DbClient.getDatastore().insert(Misc.getDefaultSetting(user.getId()));
-            userQuery.update(
-                    UpdateOperators.set("balance", 0)
-            ).execute();
-        }
-
-        userQuery = DbClient.getDatastore().find(PUser.class)
-                .filter(Filters.eq("uid", user.getId()));
-
-        users = userQuery.stream().toList();
-
         String operation = interaction.getOption("operation").getAsString();
-        PUser selectedUser = users.get(0);
         switch (operation) {
             case "add" -> {
-                selectedUser.addBalance(amount);
+                pUser.addBalance(amount);
                 embed.setDescription(amount + "MGC have been added to " + user.getAsTag());
             }
             case "subtract" -> {
-                selectedUser.subtractBalance(amount);
+                pUser.subtractBalance(amount);
                 embed.setDescription(amount + "MGC have been taken away from " + user.getAsTag());
             }
             case "set" -> {
-                selectedUser.setBalance(amount);
+                pUser.setBalance(amount);
                 embed.setDescription(user.getAsTag() + "'s balance has been set to " + amount + "MGC");
             }
         }
