@@ -5,7 +5,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.StageChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.events.ReadyEvent;
-import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceMoveEvent;
@@ -18,12 +17,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xyz.mangostudio.penguin.buttons.ButtonHandler;
 import xyz.mangostudio.penguin.commands.CommandHandler;
-import xyz.mangostudio.penguin.db.DbClient;
-import xyz.mangostudio.penguin.economy.Economy;
 import xyz.mangostudio.penguin.lavaplayer.PlayerManager;
 import xyz.mangostudio.penguin.structures.Entities;
 import xyz.mangostudio.penguin.utils.Constants;
-import xyz.mangostudio.penguin.utils.Misc;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,8 +34,6 @@ public class Listener extends ListenerAdapter {
     @Override
     public void onReady(@NotNull ReadyEvent event) {
         super.onReady(event);
-
-        new Economy(event.getJDA()).handle();
 
         event.getJDA().updateCommands().addCommands(
                 COMMAND_HANDLER.getEntities().stream().map(
@@ -141,13 +135,5 @@ public class Listener extends ListenerAdapter {
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
         super.onButtonInteraction(event);
         BUTTON_HANDLER.handle(event);
-    }
-
-    @Override
-    public void onGuildMemberJoin(@NotNull GuildMemberJoinEvent event) {
-        super.onGuildMemberJoin(event);
-        if (!event.getUser().isBot()) {
-            DbClient.getDatastore().save(Misc.getDefaultSetting(event.getUser().getId()));
-        }
     }
 }
