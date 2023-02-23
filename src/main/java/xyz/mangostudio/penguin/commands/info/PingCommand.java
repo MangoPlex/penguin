@@ -24,18 +24,18 @@ public class PingCommand extends Entities.Command {
     @Override
     public void run(SlashCommandInteraction interaction) {
         InteractionHook hook = interaction.deferReply().complete();
-        ProcessBuilder processBuilder = new ProcessBuilder();
-
         OptionMapping ip = interaction.getOption("ip");
 
         if (ip == null) {
-            interaction.replyEmbeds(
+            hook.editOriginalEmbeds(
                     new EmbedBuilder()
-                            .setDescription("Ping: " + interaction.getJDA().getShardManager().getAverageGatewayPing() + "ms")
+                            .setDescription("Ping: " + interaction.getJDA().getGatewayPing() + "ms")
                             .build()
             ).queue();
             return;
         }
+
+        ProcessBuilder processBuilder = new ProcessBuilder();
 
         if (OSUtils.isWindows())
             processBuilder.command("cmd.exe", "/c", "ping", ip.getAsString());
