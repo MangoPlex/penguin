@@ -1,4 +1,4 @@
-FROM gradle:8.0.2-jdk17-alpine
+FROM gradle:jdk17
 
 ARG DISCORD_TOKEN
 ARG DATABASE_URL
