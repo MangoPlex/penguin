@@ -4,12 +4,10 @@ import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.StageChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
-import net.dv8tion.jda.api.events.ReadyEvent;
-import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
-import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
-import net.dv8tion.jda.api.events.guild.voice.GuildVoiceMoveEvent;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.managers.AudioManager;
 import org.jetbrains.annotations.NotNull;
@@ -45,8 +43,18 @@ public class Listener extends ListenerAdapter {
     }
 
     @Override
-    public void onGuildVoiceJoin(@NotNull GuildVoiceJoinEvent event) {
-        super.onGuildVoiceJoin(event);
+    public void onGuildVoiceUpdate(@NotNull GuildVoiceUpdateEvent event) {
+        super.onGuildVoiceUpdate(event);
+
+        if (event.getChannelLeft() == null && event.getChannelJoined() != null)
+            this.onGuildVoiceJoin(event);
+        if (event.getChannelLeft() != null && event.getChannelJoined() == null)
+            this.onGuildVoiceLeave(event);
+        if (event.getChannelLeft() == null && event.getChannelJoined() == null)
+            this.onGuildVoiceMove(event);
+    }
+
+    public void onGuildVoiceJoin(@NotNull GuildVoiceUpdateEvent event) {
         if (event.getMember().getId().equalsIgnoreCase(event.getJDA().getSelfUser().getId())) {
             AudioManager man = event.getGuild().getAudioManager();
             AudioChannel channel = event.getChannelJoined();
@@ -70,9 +78,7 @@ public class Listener extends ListenerAdapter {
         }
     }
 
-    @Override
-    public void onGuildVoiceLeave(@NotNull GuildVoiceLeaveEvent event) {
-        super.onGuildVoiceLeave(event);
+    public void onGuildVoiceLeave(@NotNull GuildVoiceUpdateEvent event) {
         AudioChannel leftChannel = event.getChannelLeft();
         long memSize = leftChannel.getMembers().size();
         if (CHANNELS.contains(leftChannel.getId()) && memSize == 0) {
@@ -99,9 +105,7 @@ public class Listener extends ListenerAdapter {
         }
     }
 
-    @Override
-    public void onGuildVoiceMove(@NotNull GuildVoiceMoveEvent event) {
-        super.onGuildVoiceMove(event);
+    public void onGuildVoiceMove(@NotNull GuildVoiceUpdateEvent event) {
         if (Constants.VOICE_PARENTS.equalsIgnoreCase(event.getChannelJoined().getId())) {
             String channelName = event.getMember().getEffectiveName() + "'s lounge";
             Category parent = event.getGuild().getCategoryById(Constants.PARENT_CATEGORY);

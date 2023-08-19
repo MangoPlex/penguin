@@ -34,6 +34,6 @@ dependencies {
 
     implementation "io.github.cdimascio:dotenv-java:3.0.0"
 
-    implementation "net.dv8tion:JDA:5.0.0-alpha.19"
+    implementation "net.dv8tion:JDA:5.0.0-beta.13"
     implementation 'com.github.walkyst:lavaplayer-fork:1.4.3'
 }
