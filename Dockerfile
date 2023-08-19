@@ -16,6 +16,6 @@ ENV DATABASE_URL=${DATABASE_URL}
 
 RUN mkdir /app
 
-COPY --from=build /home/gradle/src/build/libs/Penguin-1.0.0.jar /app/Penguin-1.0.0.jar
+COPY --from=build /home/gradle/src/build/libs/Penguin-1.0.0-all.jar /app/Penguin.jar
 
-CMD java -XX:+UnlockExperimentalVMOptions -jar /app/Penguin-1.0.0.jar
+CMD java -XX:+UnlockExperimentalVMOptions -jar /app/Penguin.jar
