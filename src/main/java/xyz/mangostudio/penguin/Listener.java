@@ -1,8 +1,6 @@
 package xyz.mangostudio.penguin;
 
-import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.StageChannel;
-import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -17,7 +15,6 @@ import xyz.mangostudio.penguin.buttons.ButtonHandler;
 import xyz.mangostudio.penguin.commands.CommandHandler;
 import xyz.mangostudio.penguin.lavaplayer.PlayerManager;
 import xyz.mangostudio.penguin.structures.Entities;
-import xyz.mangostudio.penguin.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,92 +36,53 @@ public class Listener extends ListenerAdapter {
                 ).collect(Collectors.toList())
         ).queue();
 
-        LOGGER.info("Logged in as {}", event.getJDA().getSelfUser().getAsTag());
+        LOGGER.info("Logged in as {}", event.getJDA().getSelfUser().getEffectiveName());
     }
 
     @Override
     public void onGuildVoiceUpdate(@NotNull GuildVoiceUpdateEvent event) {
         super.onGuildVoiceUpdate(event);
 
-        if (event.getChannelLeft() == null && event.getChannelJoined() != null)
-            this.onGuildVoiceJoin(event);
-        if (event.getChannelLeft() != null && event.getChannelJoined() == null)
-            this.onGuildVoiceLeave(event);
-        if (event.getChannelLeft() == null && event.getChannelJoined() == null)
-            this.onGuildVoiceMove(event);
-    }
+        AudioManager man = event.getGuild().getAudioManager();
+        AudioChannel channel = event.getChannelJoined();
+        AudioChannel leftChannel = event.getChannelLeft();
+        AudioChannel joinChannel = event.getChannelJoined();
 
-    public void onGuildVoiceJoin(@NotNull GuildVoiceUpdateEvent event) {
-        if (event.getMember().getId().equalsIgnoreCase(event.getJDA().getSelfUser().getId())) {
-            AudioManager man = event.getGuild().getAudioManager();
-            AudioChannel channel = event.getChannelJoined();
-
+        if (leftChannel == null && joinChannel != null) {
             if (!man.isSelfDeafened()) man.setSelfDeafened(true);
             if (channel instanceof StageChannel stage) {
                 stage.requestToSpeak().queue();
             }
+            return;
         }
-        LOGGER.debug(event.getChannelJoined().getId());
-        if (Constants.VOICE_PARENTS.equalsIgnoreCase(event.getChannelJoined().getId())) {
-            String channelName = event.getMember().getEffectiveName() + "'s lounge";
-            Category parent = event.getGuild().getCategoryById(Constants.PARENT_CATEGORY);
+        if (leftChannel != null) {
+            long memSize = leftChannel.getMembers().stream().filter(
+                    (m) -> !m.getUser().isBot()
+            ).count();
+            if (leftChannel.getMembers().contains(event.getGuild().getSelfMember())) {
+                if (event.getMember().equals(event.getGuild().getSelfMember())) {
+                    PlayerManager.getInstance().getMusicManager(event.getGuild()).getAudioPlayer().destroy();
+                    return;
+                }
 
-            VoiceChannel channel = event.getGuild().createVoiceChannel(
-                    channelName, parent
-            ).complete();
-
-            event.getGuild().moveVoiceMember(event.getMember(), channel).queue();
-            CHANNELS.add(channel.getId());
-        }
-    }
-
-    public void onGuildVoiceLeave(@NotNull GuildVoiceUpdateEvent event) {
-        AudioChannel leftChannel = event.getChannelLeft();
-        long memSize = leftChannel.getMembers().size();
-        if (CHANNELS.contains(leftChannel.getId()) && memSize == 0) {
-            try {
-                event.getGuild().getVoiceChannelById(leftChannel.getId()).delete().queue();
-                CHANNELS.remove(leftChannel.getId());
-            } catch (Exception ignored) {
+                if (memSize == 0) {
+                    event.getGuild().getAudioManager().closeAudioConnection();
+                }
             }
-        }
-
-        if (leftChannel.getMembers().contains(event.getGuild().getSelfMember())) {
-            if (event.getMember().equals(event.getGuild().getSelfMember())) {
+            if (joinChannel == null) {
                 PlayerManager.getInstance().getMusicManager(event.getGuild()).getAudioPlayer().destroy();
+                man.closeAudioConnection();
                 return;
             }
 
-            memSize = leftChannel.getMembers().stream().filter(
+
+            memSize = joinChannel.getMembers().stream().filter(
                     (m) -> !m.getUser().isBot()
             ).count();
 
             if (memSize == 0) {
-                event.getGuild().getAudioManager().closeAudioConnection();
-            }
-        }
-    }
-
-    public void onGuildVoiceMove(@NotNull GuildVoiceUpdateEvent event) {
-        if (Constants.VOICE_PARENTS.equalsIgnoreCase(event.getChannelJoined().getId())) {
-            String channelName = event.getMember().getEffectiveName() + "'s lounge";
-            Category parent = event.getGuild().getCategoryById(Constants.PARENT_CATEGORY);
-
-            VoiceChannel channel = event.getGuild().createVoiceChannel(
-                    channelName, parent
-            ).complete();
-
-            event.getGuild().moveVoiceMember(event.getMember(), channel).queue();
-            CHANNELS.add(channel.getId());
-            return;
-        }
-        AudioChannel leftChannel = event.getChannelLeft();
-        int memSize = leftChannel.getMembers().size();
-        if (CHANNELS.contains(leftChannel.getId()) && memSize == 0) {
-            try {
-                event.getGuild().getVoiceChannelById(leftChannel.getId()).delete().queue();
-                CHANNELS.remove(leftChannel.getId());
-            } catch (Exception ignored) {
+                PlayerManager.getInstance().getMusicManager(event.getGuild()).getAudioPlayer().destroy();
+                man.closeAudioConnection();
             }
         }
     }
