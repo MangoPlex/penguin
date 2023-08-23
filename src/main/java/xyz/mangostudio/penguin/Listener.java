@@ -17,13 +17,10 @@ import xyz.mangostudio.penguin.lavaplayer.GuildMusicManager;
 import xyz.mangostudio.penguin.lavaplayer.PlayerManager;
 import xyz.mangostudio.penguin.structures.Entities;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Collectors;
 
 public class Listener extends ListenerAdapter {
     private static final Logger LOGGER = LoggerFactory.getLogger(Listener.class);
-    private static final List<String> CHANNELS = new ArrayList<>();
     private static final CommandHandler COMMAND_HANDLER = new CommandHandler();
     private static final ButtonHandler BUTTON_HANDLER = new ButtonHandler();
 
