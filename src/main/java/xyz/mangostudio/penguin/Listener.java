@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xyz.mangostudio.penguin.buttons.ButtonHandler;
 import xyz.mangostudio.penguin.commands.CommandHandler;
+import xyz.mangostudio.penguin.lavaplayer.GuildMusicManager;
 import xyz.mangostudio.penguin.lavaplayer.PlayerManager;
 import xyz.mangostudio.penguin.structures.Entities;
 
@@ -47,42 +48,23 @@ public class Listener extends ListenerAdapter {
         AudioChannel channel = event.getChannelJoined();
         AudioChannel leftChannel = event.getChannelLeft();
         AudioChannel joinChannel = event.getChannelJoined();
+        GuildMusicManager gm = PlayerManager.getInstance().getMusicManager(leftChannel.getGuild());
 
-        if (leftChannel == null && joinChannel != null) {
+        if (joinChannel != null) {
             if (!man.isSelfDeafened()) man.setSelfDeafened(true);
             if (channel instanceof StageChannel stage) {
                 stage.requestToSpeak().queue();
             }
-            return;
         }
-        if (leftChannel != null) {
-            long memSize = leftChannel.getMembers().stream().filter(
-                    (m) -> !m.getUser().isBot()
-            ).count();
-            if (leftChannel.getMembers().contains(event.getGuild().getSelfMember())) {
-                if (event.getMember().equals(event.getGuild().getSelfMember())) {
-                    PlayerManager.getInstance().getMusicManager(event.getGuild()).getAudioPlayer().destroy();
-                    return;
+        if (joinChannel == null) {
+            if (leftChannel.getMembers().contains(leftChannel.getGuild().getSelfMember())) {
+                if (
+                        leftChannel.getMembers().stream().allMatch((m) -> m.getUser().isBot()) ||
+                        event.getMember().equals(event.getGuild().getSelfMember())
+                ) {
+                    man.closeAudioConnection();
+                    gm.getAudioPlayer().destroy();
                 }
-
-                if (memSize == 0) {
-                    event.getGuild().getAudioManager().closeAudioConnection();
-                }
-            }
-            if (joinChannel == null) {
-                PlayerManager.getInstance().getMusicManager(event.getGuild()).getAudioPlayer().destroy();
-                man.closeAudioConnection();
-                return;
-            }
-
-
-            memSize = joinChannel.getMembers().stream().filter(
-                    (m) -> !m.getUser().isBot()
-            ).count();
-
-            if (memSize == 0) {
-                PlayerManager.getInstance().getMusicManager(event.getGuild()).getAudioPlayer().destroy();
-                man.closeAudioConnection();
             }
         }
     }
