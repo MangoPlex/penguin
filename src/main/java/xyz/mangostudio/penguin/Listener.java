@@ -42,18 +42,18 @@ public class Listener extends ListenerAdapter {
         super.onGuildVoiceUpdate(event);
 
         AudioManager man = event.getGuild().getAudioManager();
-        AudioChannel channel = event.getChannelJoined();
         AudioChannel leftChannel = event.getChannelLeft();
         AudioChannel joinChannel = event.getChannelJoined();
-        GuildMusicManager gm = PlayerManager.getInstance().getMusicManager(leftChannel.getGuild());
+        GuildMusicManager gm = PlayerManager.getInstance().getMusicManager(event.getGuild());
 
-        if (joinChannel != null) {
+        if (leftChannel == null && joinChannel != null) {
             if (!man.isSelfDeafened()) man.setSelfDeafened(true);
-            if (channel instanceof StageChannel stage) {
+            if (joinChannel instanceof StageChannel stage) {
                 stage.requestToSpeak().queue();
             }
         }
-        if (joinChannel == null) {
+
+        if (leftChannel != null && joinChannel == null) {
             if (leftChannel.getMembers().contains(leftChannel.getGuild().getSelfMember())) {
                 if (
                         leftChannel.getMembers().stream().allMatch((m) -> m.getUser().isBot()) ||
