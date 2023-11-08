@@ -2,26 +2,19 @@ use dotenvy::dotenv;
 use poise::serenity_prelude as serenity;
 
 pub mod commands;
+pub mod models;
 
-pub struct Data {} // User data, which is stored and accessible in all command invocations
+pub struct Data {
+    pub db: mongodm::mongo::Client,
+} // User data, which is stored and accessible in all command invocations
 pub type Error = Box<dyn std::error::Error + Send + Sync>;
 pub type Context<'a> = poise::Context<'a, Data, Error>;
-
-/// Displays your or another user's account creation date
-// #[poise::command(slash_command, prefix_command)]
-// async fn age(
-//     ctx: Context<'_>,
-//     #[description = "Selected user"] user: Option<serenity::User>,
-// ) -> Result<(), Error> {
-//     let u = user.as_ref().unwrap_or_else(|| ctx.author());
-//     let response = format!("{}'s account was created at {}", u.name, u.created_at());
-//     ctx.say(response).await?;
-//     Ok(())
-// }
 
 #[tokio::main]
 async fn main() {
     dotenv().expect(".env file not found");
+
+    let db = mongodm::mongo::Client::with_uri_str(std::env::var("MONGO_URI").expect("missing MONGO_URI")).await.expect("failed to connect to MongoDB");
 
     let framework = poise::Framework::builder()
         .options(poise::FrameworkOptions {
@@ -44,7 +37,9 @@ async fn main() {
                 let discriminator = &ready.user.discriminator;
                 println!("Logged in as {name}#{discriminator} ({id})");
 
-                Ok(Data {})
+                Ok(Data {
+                    db,
+                })
             })
         });
 

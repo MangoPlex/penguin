@@ -1,7 +1,7 @@
-pub mod fun;
+mod fun;
 pub use fun::*;
-
-pub mod utilities;
+ 
+mod utilities;
 pub use utilities::*;
 
 // pub fn commands<U, E>() -> Vec<poise::Command<U, E>> {
