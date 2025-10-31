@@ -1,16 +1,12 @@
 import { dirname, resolve } from "@discordx/importer";
 import chokidar from "chokidar";
 import { DIService, MetadataStorage } from "discordx";
+import dotenv from "dotenv";
 
 import { bot } from "./bot.js";
 
-// The following syntax should be used in the commonjs environment
-// const importPattern =  __dirname + "/{events,commands}/**/*.{ts,js}"
-
 // The following syntax should be used in the ECMAScript environment
-const importPattern = `${dirname(
-  import.meta.url,
-)}/{events,commands}/**/*.{ts,js}`;
+const importPattern = `${dirname(import.meta.url)}/features/**/*.{ts,js}`;
 
 /**
  * Import files
@@ -56,16 +52,18 @@ async function Reload() {
 async function run() {
   const watcher = chokidar.watch(importPattern);
 
+  dotenv.config();
+
   // Load commands
   await LoadFiles(importPattern);
 
   // Let's start the bot
-  if (!process.env.BOT_TOKEN) {
+  if (!process.env.DISCORD_BOT_TOKEN) {
     throw Error("Could not find BOT_TOKEN in your environment");
   }
 
   // Log in with your bot token
-  await bot.login(process.env.BOT_TOKEN);
+  await bot.login(process.env.DISCORD_BOT_TOKEN);
 
   // Hot Module reload
   if (process.env.NODE_ENV !== "production") {

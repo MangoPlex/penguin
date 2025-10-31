@@ -1,30 +1,24 @@
-import { IntentsBitField, type Interaction, type Message } from "discord.js";
+import { Events, GatewayIntentBits } from "discord.js";
 import { Client } from "discordx";
 
 export const bot = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.GuildMessageReactions,
+    GatewayIntentBits.GuildVoiceStates,
+    GatewayIntentBits.MessageContent,
+  ],
+
   // To use only guild command
   // botGuilds: [(client) => client.guilds.cache.map((guild) => guild.id)],
 
-  // Discord intents
-  intents: [
-    IntentsBitField.Flags.Guilds,
-    IntentsBitField.Flags.GuildMembers,
-    IntentsBitField.Flags.GuildMessages,
-    IntentsBitField.Flags.GuildMessageReactions,
-    IntentsBitField.Flags.GuildVoiceStates,
-    IntentsBitField.Flags.MessageContent,
-  ],
-
   // Debug logs are disabled in silent mode
   silent: false,
-
-  // Configuration for @SimpleCommand
-  simpleCommand: {
-    prefix: "!",
-  },
 });
 
-bot.once("ready", () => {
+bot.once(Events.ClientReady, () => {
   // Make sure all guilds are cached
   // await bot.guilds.fetch();
 
@@ -39,13 +33,9 @@ bot.once("ready", () => {
   //    ...bot.guilds.cache.map((g) => g.id)
   //  );
 
-  console.log("Bot started");
+  console.log(`Ready! Logged in as ${bot.user?.tag}`);
 });
 
-bot.on("interactionCreate", (interaction: Interaction) => {
+bot.on(Events.InteractionCreate, (interaction) => {
   bot.executeInteraction(interaction);
-});
-
-bot.on("messageCreate", (message: Message) => {
-  void bot.executeCommand(message);
 });
