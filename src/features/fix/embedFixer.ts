@@ -1,10 +1,10 @@
 import type { Events, Message } from "discord.js";
-import { extractUrls } from "../../utilities/discord";
+import { extractUrls } from "../../utilities/discord.js";
 import {
   checkUrlDomain,
   removeQueryParams,
   replaceDomain,
-} from "../../utilities/url";
+} from "../../utilities/url.js";
 import { ArgsOf, Discord, On } from "discordx";
 
 @Discord()
