@@ -1,4 +1,4 @@
-import { Events, GatewayIntentBits } from "discord.js";
+import { CommandInteraction, Events, GatewayIntentBits } from "discord.js";
 import { Client } from "discordx";
 
 export const bot = new Client({
@@ -36,6 +36,9 @@ bot.once(Events.ClientReady, () => {
   console.log(`Ready! Logged in as ${bot.user?.tag}`);
 });
 
-bot.on(Events.InteractionCreate, (interaction) => {
+bot.on(Events.InteractionCreate, async (interaction) => {
+  if (interaction instanceof CommandInteraction) {
+    await interaction.deferReply();
+  }
   bot.executeInteraction(interaction);
 });
