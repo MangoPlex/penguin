@@ -104,7 +104,7 @@ function applyFix(message: Message): void {
 
   for (let _url of urls) {
     let url = _url[0];
-    let cleanUrl;
+    let cleanUrl: string;
     try {
       cleanUrl = removeQueryParams(url).replace("www.", "");
     } catch {
@@ -123,7 +123,7 @@ function applyFix(message: Message): void {
         message.channel.isTextBased() &&
         "send" in message.channel
       ) {
-        message.channel.send(`${new_url}`);
+        message.channel.send(`[Fixed Embed URL](${new_url})`);
       }
     }
   }
