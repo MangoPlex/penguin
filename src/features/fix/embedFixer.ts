@@ -111,42 +111,45 @@ const MEDIA_EMBED_FIXERS: MediaEmbedFixer[] = [
 ];
 
 function findEmbedFixer(url: string): MediaEmbedFixer | null {
-  for (const fixer of MEDIA_EMBED_FIXERS) {
-    if (fixer.matchUrl(url)) {
-      return fixer;
-    }
-  }
-
-  return null;
+  return MEDIA_EMBED_FIXERS.find((fixer) => fixer.matchUrl(url)) ?? null;
 }
 
 function applyFix(message: Message): void {
-  let content = message.content;
-  let urls = extractUrls(content);
+  const urls = extractUrls(message.content);
 
-  for (let _url of urls) {
-    let url = _url[0];
+  // No need to proceed if no URLs found
+  if (urls.length === 0) return;
+
+  const fixed_urls: string[] = [];
+
+  for (const _url of urls) {
+    const url = _url[0];
     let cleanUrl: string;
     try {
       cleanUrl = removeQueryParams(url).replace("www.", "");
     } catch {
+      console.warn(`Failed to parse URL during apply embed fix: ${url}`);
       continue;
     }
 
     const fixer = findEmbedFixer(cleanUrl);
-    if (fixer === null) continue;
+    if (!fixer) continue;
 
     for (const fix of fixer.fixes) {
-      if (!checkUrlDomain(cleanUrl, fix.originalDomain)) continue;
-      let new_url = replaceDomain(cleanUrl, fix.replacementDomain);
-
-      if (
-        message.channel &&
-        message.channel.isTextBased() &&
-        "send" in message.channel
-      ) {
-        message.channel.send(`[Fixed Embed URL](${new_url})`);
+      if (checkUrlDomain(cleanUrl, fix.originalDomain)) {
+        const new_url = replaceDomain(cleanUrl, fix.replacementDomain);
+        fixed_urls.push(`[Preview Embed URL](${new_url})`);
       }
     }
+  }
+
+  // Only proceed if we have fixed URLs and valid channel
+  if (fixed_urls.length > 0 && message.channel && "send" in message.channel) {
+    message.suppressEmbeds(true);
+
+    message.reply({
+      content: `${fixed_urls.join("\n")}`,
+      allowedMentions: { repliedUser: false },
+    });
   }
 }
