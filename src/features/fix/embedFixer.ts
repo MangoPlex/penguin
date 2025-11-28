@@ -138,7 +138,7 @@ function applyFix(message: Message): void {
     for (const fix of fixer.fixes) {
       if (checkUrlDomain(cleanUrl, fix.originalDomain)) {
         const new_url = replaceDomain(cleanUrl, fix.replacementDomain);
-        fixed_urls.push(`[Preview Embed URL](${new_url})`);
+        fixed_urls.push(new_url);
       }
     }
   }
@@ -148,7 +148,9 @@ function applyFix(message: Message): void {
     message.suppressEmbeds(true);
 
     message.reply({
-      content: `${fixed_urls.join("\n")}`,
+      content: fixed_urls
+        .map((url) => `[Preview Embed URL](${url})`)
+        .join("\n"),
       allowedMentions: { repliedUser: false },
     });
   }

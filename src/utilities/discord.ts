@@ -1,19 +1,22 @@
 export function extractUrls(text: string): Array<[string, boolean]> {
   const spoilerPattern = /\|\|(https?:\/\/[^\s|]+)\|\|/g;
-  const regularPattern = /(?<!\$)(https?:\/\/[^\s]+)/g;
+  const regularPattern = /(https?:\/\/[^\s]+)/g;
 
-  // Find spoiler URLs
-  const spoilerUrls: Array<[string, boolean]> = Array.from(
-    text.matchAll(spoilerPattern),
-    (match) => (match[1] !== undefined ? [match[1], true] : undefined),
-  ).filter((item): item is [string, boolean] => item !== undefined);
+  const urls: Array<[string, boolean]> = [];
 
-  // Remove spoilers and find regular URLs
+  // Find spoiler URLs first
+  let match: RegExpExecArray | null;
+  while ((match = spoilerPattern.exec(text)) !== null) {
+    urls.push([match[1], true]);
+  }
+
+  // Remove spoilers from text to avoid double-matching
   const textWithoutSpoilers = text.replace(spoilerPattern, "");
-  const regularUrls: Array<[string, boolean]> = Array.from(
-    textWithoutSpoilers.matchAll(regularPattern),
-    (match) => (match[1] !== undefined ? [match[1], false] : undefined),
-  ).filter((item): item is [string, boolean] => item !== undefined);
 
-  return [...spoilerUrls, ...regularUrls];
+  // Find regular URLs
+  while ((match = regularPattern.exec(textWithoutSpoilers)) !== null) {
+    urls.push([match[1], false]);
+  }
+
+  return urls;
 }
