@@ -18,7 +18,9 @@ export class EmbedFixerEventHandler {
 enum MediaProvider {
   Facebook = "facebook",
   Instgram = "instagram",
+  Threads = "threads",
   Tiktok = "tiktok",
+  Reddit = "reddit",
 }
 
 class MediaEmbedReplaceFix {
@@ -78,6 +80,17 @@ const MEDIA_EMBED_FIXERS: MediaEmbedFixer[] = [
     [new MediaEmbedReplaceFix("instagram.com", "kkinstagram.com")],
   ),
   new MediaEmbedFixer(
+    MediaProvider.Threads,
+    [
+      /https:\/\/(www\.)?threads\.(net|com)\/@[\w.]+\/?/,
+      /https:\/\/(www\.)?threads\.(net|com)\/@[\w.]+\/post\/[\w]+\/?/,
+    ],
+    [
+      new MediaEmbedReplaceFix("threads.net", "fixthreads.net"),
+      new MediaEmbedReplaceFix("threads.com", "fixthreads.net"),
+    ],
+  ),
+  new MediaEmbedFixer(
     MediaProvider.Tiktok,
     [
       /https:\/\/(www\.)?tiktok\.com\/(t\/\w+|@[\w.]+\/video\/\d+)\/?/,
@@ -85,6 +98,15 @@ const MEDIA_EMBED_FIXERS: MediaEmbedFixer[] = [
       /https:\/\/vt\.tiktok\.com\/\w+\/?/,
     ],
     [new MediaEmbedReplaceFix("tiktok.com", "a.tnktok.com")],
+  ),
+  new MediaEmbedFixer(
+    MediaProvider.Reddit,
+    [
+      /https:\/\/(www\.|old\.)?reddit\.com\/r\/[\w]+\/comments\/[\w]+\/[\w]+\/?/,
+      /https:\/\/(www\.|old\.)?reddit\.com\/r\/[\w]+\/s\/[\w]+\/?/,
+      /https:\/\/(www\.|old\.)?reddit\.com\/user\/[\w]+\/comments\/[\w]+\/[\w]+\/?/,
+    ],
+    [new MediaEmbedReplaceFix("reddit.com", "rxddit.com")],
   ),
 ];
 
