@@ -49,13 +49,7 @@ class MediaEmbedFixer {
   }
 
   public matchUrl(url: string): boolean {
-    for (const urlPattern of this.urls) {
-      const regex = new RegExp(urlPattern);
-      if (regex.test(url)) {
-        return true;
-      }
-    }
-    return false;
+    return this.urls.some((pattern) => pattern.test(url));
   }
 }
 
