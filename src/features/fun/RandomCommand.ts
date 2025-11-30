@@ -7,43 +7,45 @@ import { Discord, Slash, SlashGroup, SlashOption } from "discordx";
 import { randomInt } from "../../utilities/rng";
 
 @Discord()
-@SlashGroup("random")
+@SlashGroup({ description: "Generate random stuff", name: "random" })
 export class RandomCommand {
+  @SlashGroup("random")
   @Slash({ description: "Generate a random number" })
   async number(
     @SlashOption({
       type: ApplicationCommandOptionType.Integer,
       description: "Lower bound number (default: 1)",
-      name: "min",
+      name: "lower",
       required: false,
     })
-    min: number = 1,
+    lower: number = 1,
     @SlashOption({
       type: ApplicationCommandOptionType.Integer,
       description: "Upper bound number (default: 100)",
-      name: "max",
+      name: "upper",
       required: false,
     })
-    max: number = 100,
+    upper: number = 100,
     interaction: CommandInteraction,
   ): Promise<void> {
-    if (min > max) {
-      await interaction.reply({
-        content: "❌ Minimum value cannot be greater than maximum value!",
-        ephemeral: true,
+    if (lower > upper) {
+      await interaction.editReply({
+        content:
+          "⚠️ The lower bound number must be less than or equal to the upper bound number.",
       });
 
       return;
     }
 
-    await interaction.reply({
+    await interaction.editReply({
       content: `🎲 Your random number is: **${randomInt(
-        min,
-        max,
-      )}** (${min} - ${max})`,
+        lower,
+        upper,
+      )}** (${lower} - ${upper})`,
     });
   }
 
+  @SlashGroup("random")
   @Slash({ description: "Generate a random color" })
   async color(interaction: CommandInteraction): Promise<void> {
     const randomColor = Math.floor(Math.random() * 16777215);
@@ -55,6 +57,6 @@ export class RandomCommand {
       .setColor(randomColor)
       .setTimestamp();
 
-    await interaction.reply({ embeds: [embed] });
+    await interaction.editReply({ embeds: [embed] });
   }
 }

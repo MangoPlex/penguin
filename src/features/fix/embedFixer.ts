@@ -5,7 +5,7 @@ import {
   removeQueryParams,
   replaceDomain,
 } from "../../utilities/url.js";
-import { ArgsOf, Discord, On } from "discordx";
+import { type ArgsOf, Discord, On } from "discordx";
 
 @Discord()
 export class EmbedFixerEventHandler {

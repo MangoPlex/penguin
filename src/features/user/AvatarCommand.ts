@@ -2,6 +2,8 @@ import {
   ApplicationCommandOptionType,
   CommandInteraction,
   EmbedBuilder,
+  HexColorString,
+  User,
 } from "discord.js";
 import { Discord, Slash, SlashOption } from "discordx";
 
@@ -15,7 +17,7 @@ export class AvatarCommand {
       type: ApplicationCommandOptionType.User,
       required: false,
     })
-    user: any,
+    user: User | undefined,
     interaction: CommandInteraction,
   ): Promise<void> {
     const targetUser = user || interaction.user;
@@ -25,6 +27,6 @@ export class AvatarCommand {
       .setImage(targetUser.displayAvatarURL({ size: 512 }))
       .setColor("#0099ff");
 
-    await interaction.reply({ embeds: [embed] });
+    await interaction.editReply({ embeds: [embed] });
   }
 }
