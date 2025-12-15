@@ -15,6 +15,7 @@ regex-lite = "0.1"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 sqlx = { version = "0.8", features = ["runtime-tokio", "tls-rustls", "postgres", "derive", "macros", "migrate", "chrono", "json" ] }
+sysinfo = "0.37"
 tokio = { version = "1.0", features = ["full"] }
 tracing = "0.1"
 tracing-error = "0.2"
