@@ -73,7 +73,11 @@ async fn update_presence(ctx: Arc<serenity::Context>, start_time: Instant) {
         let uptime = start_time.elapsed();
         let memory_usage = os::get_memory_usage(std::process::id());
 
-        let status = format!("Uptime: {} | Mem: {}", format_time(uptime), memory_usage);
+        let status = format!(
+            "Uptime: {} | Mem: {:.1} MB",
+            format_time(uptime),
+            memory_usage
+        );
 
         ctx.set_activity(Some(ActivityData::watching(&status)))
     }
