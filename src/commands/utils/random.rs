@@ -16,11 +16,13 @@ pub async fn number(
     ctx: Context<'_>,
     #[description = "Lower bound number (default: 1)"] lower: Option<u32>,
     #[description = "Upper bound number (default: 100)"] upper: Option<u32>,
+    #[description = "How many numbers to generate (default: 1 | max: 36)"] times: Option<u32>,
 ) -> Result<()> {
     ctx.defer().await?;
 
     let lower = lower.unwrap_or(1);
     let upper = upper.unwrap_or(100);
+    let times = times.unwrap_or(1).clamp(1, 36);
 
     if lower >= upper {
         ctx.send(
@@ -32,9 +34,19 @@ pub async fn number(
         return Ok(());
     }
 
+    let mut numbers = Vec::new();
+    for _ in 0..times {
+        let num = rand::rng().random_range(lower..=upper);
+        numbers.push(num);
+    }
+
     ctx.send(CreateReply::default().content(format!(
-        "🎲 Random Number: {}",
-        rand::rng().random_range(lower..=upper)
+        "🎲 Random Numbers: {}",
+        numbers
+            .iter()
+            .map(|n| n.to_string())
+            .collect::<Vec<String>>()
+            .join(", ")
     )))
     .await?;
 
