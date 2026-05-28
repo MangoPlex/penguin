@@ -30,7 +30,7 @@ pub async fn setup() -> Client {
 
     let framework = poise::Framework::builder()
         .options(poise::FrameworkOptions {
-            commands: vec![commands::utils::random(), commands::user::avatar()],
+            commands: vec![commands::utils::random(), commands::user::avatar(), commands::voice::join()],
             event_handler: |ctx, event, framework, data| {
                 Box::pin(event_handler(ctx, event, framework, data))
             },
