@@ -9,7 +9,7 @@ songbird = "0.6"
 
 tokio = { version = "1.52", features = ["rt-multi-thread", "macros"] }
 
-rand = "0.9"
+rand = "0.10"
 url = "2.5"
 
 regex-lite = "0.1"
