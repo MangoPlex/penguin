@@ -42,6 +42,10 @@ RUN --mount=type=bind,source=src,target=src \
 
 FROM debian:bookworm-slim AS final
 
+RUN apt-get update && apt-get install -y \
+    libopus0 \
+ && rm -rf /var/lib/apt/lists/*
+
 # Create a non-privileged user that the app will run under.
 # See https://docs.docker.com/go/dockerfile-user-best-practices/
 ARG UID=10001
