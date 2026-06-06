@@ -6,7 +6,7 @@
 
 # Want to help us make this template better? Share your feedback here: https://forms.gle/ybq9Krt8jtBL3iCk7
 
-ARG RUST_VERSION=1.91.1
+ARG RUST_VERSION=1.95.0
 ARG APP_NAME=penguin
 
 ################################################################################
@@ -28,7 +28,6 @@ RUN apk add --no-cache clang lld musl-dev git
 # source code into the container. Once built, copy the executable to an
 # output directory before the cache mounted /app/target is unmounted.
 RUN --mount=type=bind,source=src,target=src \
-    --mount=type=bind,source=migrations,target=migrations \
     --mount=type=bind,source=Cargo.toml,target=Cargo.toml \
     --mount=type=bind,source=Cargo.lock,target=Cargo.lock \
     --mount=type=cache,target=/app/target/ \

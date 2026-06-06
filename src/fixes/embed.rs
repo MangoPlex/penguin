@@ -1,6 +1,7 @@
+use std::sync::LazyLock;
+
 use poise::serenity_prelude::{CreateMessage, Message};
 use regex_lite::Regex;
-use std::sync::LazyLock;
 
 use crate::utils::url::{
     check_url_domain, extract_urls_from_message, remove_query_params, replace_domain,
@@ -106,13 +107,7 @@ impl MediaEmbedFixer {
 }
 
 fn find_embed_fixer(url: &str) -> Option<&'static MediaEmbedFixer> {
-    for fixer in MEDIA_EMBED_FIXES.iter() {
-        if fixer.match_url(url) {
-            return Some(fixer);
-        }
-    }
-
-    None
+    MEDIA_EMBED_FIXES.iter().find(|f| f.match_url(url))
 }
 
 pub async fn apply_fix(message: &mut Message, http: &poise::serenity_prelude::Http) {

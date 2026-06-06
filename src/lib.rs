@@ -6,6 +6,7 @@ use std::{
 use poise::serenity_prelude::{
     self as serenity, ActivityData, Client, ClientBuilder, GatewayIntents, GuildId,
 };
+use songbird::SerenityInit;
 use tokio::task;
 
 use crate::utils::os;
@@ -13,7 +14,6 @@ use crate::utils::os;
 mod commands;
 mod fixes;
 
-pub mod database;
 pub mod utils;
 
 pub struct Data {
@@ -26,11 +26,15 @@ pub type Result<T> = std::result::Result<T, Error>;
 pub async fn setup() -> Client {
     let token = dotenvy::var("DISCORD_TOKEN").expect("missing DISCORD_TOKEN");
     let guild_id = dotenvy::var("GUILD_ID").expect("missing GUILD_ID");
-    let intents = GatewayIntents::all();
+    let intents = GatewayIntents::GUILD_MESSAGES | GatewayIntents::MESSAGE_CONTENT;
 
     let framework = poise::Framework::builder()
         .options(poise::FrameworkOptions {
-            commands: vec![commands::utils::random(), commands::user::avatar(), commands::voice::join()],
+            commands: vec![
+                commands::utils::random(),
+                commands::user::avatar(),
+                commands::voice::join(),
+            ],
             event_handler: |ctx, event, framework, data| {
                 Box::pin(event_handler(ctx, event, framework, data))
             },
@@ -53,6 +57,7 @@ pub async fn setup() -> Client {
 
     ClientBuilder::new(token, intents)
         .framework(framework)
+        .register_songbird()
         .await
         .expect("Error creating client")
 }
@@ -91,7 +96,7 @@ async fn event_handler(
 ) -> Result<()> {
     match event {
         serenity::FullEvent::Ready { data_about_bot, .. } => {
-            println!("Ready! Logged in as {}", data_about_bot.user.name);
+            tracing::info!("Ready! Logged in as {}", data_about_bot.user.name);
 
             let rctx = Arc::new(ctx.clone());
             let start_time = data.start_time;

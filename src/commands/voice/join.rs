@@ -1,29 +1,31 @@
+use crate::{Context, Result};
 use poise::CreateReply;
 use poise::serenity_prelude::Mentionable;
-use crate::{Context, Result};
 
 #[poise::command(slash_command)]
 pub async fn join(ctx: Context<'_>) -> Result<()> {
     ctx.defer().await?;
 
+    let guild_id = ctx.guild_id().ok_or("Not in a guild")?;
     let channel_id = {
-        let guild = ctx
-            .guild()
-            .ok_or("Could not fetch guild")?;
+        let guild = ctx.guild().ok_or("Guild not found")?;
 
-        let user_voice_state = guild
+        guild
             .voice_states
             .get(&ctx.author().id)
-            .ok_or("You are not in a voice channel")?;
-
-        user_voice_state
-            .channel_id
+            .and_then(|vs| vs.channel_id)
             .ok_or("You are not in a voice channel")?
     };
 
-    let channel = ctx.serenity_context().http.get_channel(channel_id).await?;
+    let manager = songbird::get(ctx.serenity_context())
+        .await
+        .ok_or("Songbird not initialized")?
+        .clone();
 
+    let channel = ctx.serenity_context().http.get_channel(channel_id).await?;
     let response = format!("Joined voice channel: {}", channel.mention());
+
+    manager.join(guild_id, channel_id).await?;
     ctx.send(CreateReply::default().content(response)).await?;
 
     Ok(())

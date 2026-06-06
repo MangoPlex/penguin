@@ -1,26 +1,25 @@
+use std::sync::LazyLock;
+
+use regex_lite::Regex;
 use url::Url;
 
 use crate::Result;
 
-pub fn extract_urls_from_message(message: &str) -> Vec<(String, bool)> {
-    const SPOILER_URL_REGEX: &'static str = r"\|\|(https?://[^\s|]+)\|\|";
-    const URL_REGEX: &'static str = r"(https?://[^\s|]+)";
+static SPOILER_URL_REGEX: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"\|\|(https?://[^\s|]+)\|\|").unwrap());
 
+static URL_REGEX: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(https?://[^\s|]+)").unwrap());
+
+pub fn extract_urls_from_message(message: &str) -> Vec<(String, bool)> {
     let mut urls = Vec::new();
     let mut remaining_message = message;
 
-    while let Some(mat) = regex::Regex::new(SPOILER_URL_REGEX)
-        .unwrap()
-        .find(remaining_message)
-    {
+    while let Some(mat) = SPOILER_URL_REGEX.find(remaining_message) {
         urls.push((mat.as_str()[2..mat.as_str().len() - 2].to_string(), true));
         remaining_message = &remaining_message[mat.end()..];
     }
 
-    while let Some(mat) = regex::Regex::new(URL_REGEX)
-        .unwrap()
-        .find(remaining_message)
-    {
+    while let Some(mat) = URL_REGEX.find(remaining_message) {
         urls.push((mat.as_str().to_string(), false));
         remaining_message = &remaining_message[mat.end()..];
     }
