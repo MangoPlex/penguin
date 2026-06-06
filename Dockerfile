@@ -17,7 +17,15 @@ ARG APP_NAME
 WORKDIR /app
 
 # Install host build dependencies.
-RUN apk add --no-cache clang lld musl-dev git
+RUN apk add --no-cache \
+    build-base \
+    cmake \
+    pkgconf \
+    clang \
+    lld \
+    musl-dev \
+    git \
+    opus-dev
 
 # Build the application.
 # Leverage a cache mount to /usr/local/cargo/registry/
