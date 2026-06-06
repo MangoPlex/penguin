@@ -12,20 +12,18 @@ ARG APP_NAME=penguin
 ################################################################################
 # Create a stage for building the application.
 
-FROM rust:${RUST_VERSION}-alpine AS build
+FROM rust:${RUST_VERSION}-slim AS build
 ARG APP_NAME
 WORKDIR /app
 
 # Install host build dependencies.
-RUN apk add --no-cache \
-    build-base \
+RUN apt-get update && apt-get install -y \
+    build-essential \
     cmake \
-    pkgconf \
-    clang \
-    lld \
-    musl-dev \
+    pkg-config \
+    libopus-dev \
     git \
-    opus-dev
+ && rm -rf /var/lib/apt/lists/*
 
 # Build the application.
 # Leverage a cache mount to /usr/local/cargo/registry/
