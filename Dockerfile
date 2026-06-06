@@ -7,13 +7,11 @@
 # Want to help us make this template better? Share your feedback here: https://forms.gle/ybq9Krt8jtBL3iCk7
 
 ARG RUST_VERSION=1.95.0
-ARG APP_NAME=penguin
 
 ################################################################################
 # Create a stage for building the application.
 
 FROM rust:${RUST_VERSION}-slim AS build
-ARG APP_NAME
 WORKDIR /app
 
 # Install host build dependencies.
@@ -40,7 +38,7 @@ RUN --mount=type=bind,source=src,target=src \
     --mount=type=cache,target=/usr/local/cargo/git/db \
     --mount=type=cache,target=/usr/local/cargo/registry/ \
     cargo build --locked --release && \
-    cp ./target/release/$APP_NAME /bin/server
+    cp ./target/release/penguin /bin/penguin
 
 ################################################################################
 # Create a new stage for running the application that contains the minimal
@@ -68,7 +66,7 @@ RUN adduser \
 USER appuser
 
 # Copy the executable from the "build" stage.
-COPY --from=build /bin/server /bin/
+COPY --from=build /bin/penguin /bin/
 
 # What the container should run when it is started.
-CMD ["/bin/server"]
+CMD ["/bin/penguin"]
