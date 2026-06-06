@@ -2,7 +2,7 @@ use poise::{
     CreateReply,
     serenity_prelude::{CreateEmbed, Timestamp},
 };
-use rand::Rng;
+use rand::RngExt;
 
 use crate::{Context, Result};
 
