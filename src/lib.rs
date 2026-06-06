@@ -26,7 +26,10 @@ pub type Result<T> = std::result::Result<T, Error>;
 pub async fn setup() -> Client {
     let token = dotenvy::var("DISCORD_TOKEN").expect("missing DISCORD_TOKEN");
     let guild_id = dotenvy::var("GUILD_ID").expect("missing GUILD_ID");
-    let intents = GatewayIntents::GUILD_MESSAGES | GatewayIntents::MESSAGE_CONTENT;
+    let intents = GatewayIntents::GUILDS
+        | GatewayIntents::GUILD_MESSAGES
+        | GatewayIntents::GUILD_VOICE_STATES
+        | GatewayIntents::MESSAGE_CONTENT;
 
     let framework = poise::Framework::builder()
         .options(poise::FrameworkOptions {
