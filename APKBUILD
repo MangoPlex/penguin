@@ -1,6 +1,6 @@
 # Maintainer: MangoPlex <38831897+justmangoou@users.noreply.github.com>
 pkgname=penguin
-pkgver=1.2.6
+pkgver=1.2.7
 pkgrel=0
 pkgdesc="Our server Discord bot"
 url="https://github.com/MangoPlex/penguin"
@@ -17,6 +17,7 @@ makedepends="
 depends="opus"
 # This private package is built from the checked-out repository, not a
 # separately distributed source archive.
+srcdir="$startdir/.abuild-src"
 builddir="$startdir"
 
 build() {
