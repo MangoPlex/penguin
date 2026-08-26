@@ -1,6 +1,6 @@
 # Maintainer: MangoPlex <38831897+justmangoou@users.noreply.github.com>
 pkgname=penguin
-pkgver=1.2.4
+pkgver=1.2.5
 pkgrel=0
 pkgdesc="Our server Discord bot"
 url="https://github.com/MangoPlex/penguin"
