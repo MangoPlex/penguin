@@ -5,7 +5,8 @@ is not required or supported.
 
 ## Build and install on Alpine
 
-Run these commands from a checkout of the tag matching `pkgver` in `APKBUILD`:
+Run these commands on Alpine 3.23 or later from a checkout of the tag matching
+`pkgver` in `APKBUILD`:
 
 ```sh
 doas apk add abuild build-base cargo cmake openssl opus-dev pkgconf rust

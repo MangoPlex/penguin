@@ -12,7 +12,7 @@ jobs:
   build-apk:
     name: Build Alpine APK
     runs-on: ubuntu-latest
-    container: alpine:3.22
+    container: alpine:3.23
     steps:
       - uses: actions/checkout@v7
 
@@ -29,7 +29,9 @@ jobs:
           adduser -D builder
           addgroup builder abuild
           chown -R builder:abuild "$GITHUB_WORKSPACE"
-          su - builder -s /bin/sh -c "abuild-keygen -a -n && cd '$GITHUB_WORKSPACE' && abuild -r"
+          su - builder -s /bin/sh -c "abuild-keygen -a -n"
+          cp /home/builder/.abuild/*.rsa.pub /etc/apk/keys/
+          su - builder -s /bin/sh -c "cd '$GITHUB_WORKSPACE' && abuild -r"
           mkdir -p /tmp/apk-artifacts
           find /home/builder/packages -type f -name '*.apk' -exec cp {} /tmp/apk-artifacts/ \;
 

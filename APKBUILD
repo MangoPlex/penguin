@@ -21,11 +21,11 @@ srcdir="$startdir/.abuild-src"
 builddir="$startdir"
 
 build() {
-	cargo build --frozen --release
+	cargo build --locked --release
 }
 
 check() {
-	cargo test --frozen
+	cargo test --locked
 }
 
 package() {
