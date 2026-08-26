@@ -5,19 +5,18 @@ is not required or supported.
 
 ## Build and install on Alpine
 
-Run these commands from a checkout of the `v1.2.4` tag (or the corresponding
-version in `APKBUILD`):
+Run these commands from a checkout of the tag matching `pkgver` in `APKBUILD`:
 
 ```sh
 doas apk add abuild build-base cargo cmake openssl opus-dev pkgconf rust
 doas adduser "$USER" abuild
 abuild-keygen -a -i
 abuild -r
-doas apk add --allow-untrusted ~/packages/"$(uname -m)"/penguin-1.2.4-r0.apk
+doas apk add --allow-untrusted ~/packages/"$(uname -m)"/penguin-"$(sed -n 's/^pkgver=//p' APKBUILD)"-r0.apk
 ```
 
-`abuild -r` downloads the tagged source, builds it with Alpine's native Rust
-toolchain, runs the test suite, and writes the APK to `~/packages/`.
+`abuild -r` builds the checked-out source with Alpine's native Rust toolchain,
+runs the test suite, and writes the APK to `~/packages/`.
 Log out and back in after adding yourself to the `abuild` group if the group
 membership is not active in the current shell.
 
