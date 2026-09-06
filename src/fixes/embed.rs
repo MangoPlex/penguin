@@ -17,7 +17,10 @@ static MEDIA_EMBED_FIXES: LazyLock<Vec<MediaEmbedFixer>> = LazyLock::new(|| {
                 Regex::new(r"https://(www\.)?facebook\.com/reel/\d+/?").unwrap(),
                 Regex::new(r"https://(www\.)?facebook\.com/share/v/[\w]+/?").unwrap(),
             ],
-            fixes: vec![MediaEmbedReplaceFix::new("facebook.com", "facebed.com")],
+            fixes: vec![MediaEmbedReplaceFix::new(
+                "facebook.com",
+                "facebed.justmangoou.dev",
+            )],
         },
         MediaEmbedFixer {
             provider: MediaProvider::Instagram,
