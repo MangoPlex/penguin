@@ -1,43 +1,33 @@
 # PENGUIN
 
-`penguin` is installed on Alpine Linux as a locally built APK package. Docker
-is not required or supported.
-
-## Build and install on Alpine
-
-Run these commands on Alpine 3.23 or later from a checkout of the tag matching
-`pkgver` in `APKBUILD`:
-
-```sh
-doas apk add abuild build-base cargo cmake openssl opus-dev pkgconf rust
-doas adduser "$USER" abuild
-abuild-keygen -a -i
-abuild -r
-doas apk add --allow-untrusted ~/packages/"$(uname -m)"/penguin-"$(sed -n 's/^pkgver=//p' APKBUILD)"-r0.apk
-```
-
-`abuild -r` builds the checked-out source with Alpine's native Rust toolchain,
-runs the test suite, and writes the APK to `~/packages/`.
-Log out and back in after adding yourself to the `abuild` group if the group
-membership is not active in the current shell.
+`penguin` is distributed as a Docker image through GitHub Container Registry.
 
 ## Run
 
-The package installs the executable at `/usr/bin/penguin`. Supply the required
-Discord credentials through the environment before starting it:
+Pull the latest release and supply the Discord credentials through environment
+variables:
 
 ```sh
-export DISCORD_TOKEN='your-discord-token'
-export GUILD_ID='your-discord-guild-id'
-penguin
+docker pull ghcr.io/mangoplex/penguin:latest
+docker run --rm \
+  -e DISCORD_TOKEN='your-discord-token' \
+  -e GUILD_ID='your-discord-guild-id' \
+  ghcr.io/mangoplex/penguin:latest
 ```
 
-The package deliberately does not create a user, install an OpenRC service, or
-store credentials. Choose the process supervisor and secret-management method
-appropriate for the host.
+Use a version tag such as `v1.2.7` instead of `latest` to pin a release.
 
-## Tagged GitHub releases
+The container runs as an unprivileged user and does not store credentials.
 
-Pushing a tag named `v<version>` starts the GitHub Actions workflow. It builds
-the APK in Alpine and attaches the resulting package to a GitHub Release. The
-tag must match `pkgver` in `APKBUILD`; update both before tagging a new version.
+## Build locally
+
+```sh
+docker build -t penguin .
+```
+
+## Tagged releases
+
+Pushing a tag named `v<version>` starts the GitHub Actions workflow. The tag
+must match the package version in `Cargo.toml`. A successful build publishes
+`ghcr.io/mangoplex/penguin:<tag>` and updates
+`ghcr.io/mangoplex/penguin:latest`.

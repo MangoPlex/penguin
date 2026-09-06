@@ -1,60 +1,62 @@
-name: Build Alpine package and release
+name: Build and publish Docker image
 
 on:
   push:
     tags:
       - "v*"
 
-permissions:
-  contents: write
+env:
+  REGISTRY: ghcr.io
 
 jobs:
-  build-apk:
-    name: Build Alpine APK
+  build-and-push-image:
+    name: Build and publish Docker image
     runs-on: ubuntu-latest
-    container: alpine:3.23
+    permissions:
+      contents: read
+      packages: write
+
     steps:
-      - uses: actions/checkout@v7
+      - name: Checkout repository
+        uses: actions/checkout@v7
 
       - name: Verify tag version
         run: |
-          expected_tag="v$(sed -n 's/^pkgver=//p' APKBUILD)"
-          test "$GITHUB_REF_NAME" = "$expected_tag"
+          package_version="$(sed -n 's/^version = "\([^"]*\)"/\1/p' Cargo.toml | head -n 1)"
+          test -n "$package_version"
+          test "$GITHUB_REF_NAME" = "v$package_version"
 
-      - name: Install Alpine build dependencies
-        run: apk add --no-cache abuild build-base cargo cmake openssl opus-dev pkgconf rust
+      - name: Set image name
+        id: image
+        run: echo "name=${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
 
-      - name: Build APK
-        run: |
-          adduser -D builder
-          addgroup builder abuild
-          chown -R builder:abuild "$GITHUB_WORKSPACE"
-          su - builder -s /bin/sh -c "abuild-keygen -a -n"
-          cp /home/builder/.abuild/*.rsa.pub /etc/apk/keys/
-          su - builder -s /bin/sh -c "cd '$GITHUB_WORKSPACE' && abuild -r"
-          mkdir -p /tmp/apk-artifacts
-          find /home/builder/packages -type f -name '*.apk' -exec cp {} /tmp/apk-artifacts/ \;
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
 
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v7
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v4
         with:
-          name: alpine-apk
-          path: /tmp/apk-artifacts/*.apk
-          if-no-files-found: error
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-  release:
-    name: Publish GitHub release
-    needs: build-apk
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download APK artifact
-        uses: actions/download-artifact@v8
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v6
         with:
-          name: alpine-apk
-          path: dist
+          images: ${{ env.REGISTRY }}/${{ steps.image.outputs.name }}
+          tags: |
+            type=ref,event=tag
+            type=raw,value=latest
 
-      - name: Publish release
-        uses: softprops/action-gh-release@v3
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v7
         with:
-          generate_release_notes: true
-          files: dist/*.apk
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
