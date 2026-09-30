@@ -1,0 +1,9 @@
+# Copy this file to config.toml (or point CONFIG_PATH at a copy) and edit as
+# needed. The bot polls this file for changes and reloads it automatically,
+# no restart required.
+
+[price_tracker]
+# Discord channel IDs to post to when prices change.
+# Leave a key unset (or comment it out) to disable that tracker.
+# fuel_channel_id = 123456789012345678
+# electricity_channel_id = 123456789012345678
