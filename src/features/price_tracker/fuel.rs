@@ -9,7 +9,8 @@ use crate::{
     cache::Cache,
     config::SharedConfig,
     features::price_tracker::{
-        VN_UTC_OFFSET_HOURS, load_snapshot, save_snapshot, wait_for_next_check,
+        CheckTrigger, VN_UTC_OFFSET_HOURS, load_snapshot, save_snapshot, should_announce,
+        wait_for_next_check,
     },
     utils::text::{COLOR_NEUTRAL, format_change, format_vnd},
 };
@@ -125,14 +126,15 @@ fn to_snapshot(prices: &[FuelPrice]) -> HashMap<String, FuelPrice> {
         .collect()
 }
 
-/// Announces the current prices when they differ from the last announced
-/// snapshot (or when there is none yet), then stores them as the new snapshot.
+/// Announces the current fuel prices after each scheduled check, and also on
+/// startup or a config-triggered check when they differ from the last snapshot.
 async fn check_prices(
     ctx: &serenity::Context,
     config: &SharedConfig,
     client: &reqwest::Client,
     cache: &Option<Arc<Cache>>,
     last: &mut Option<HashMap<String, FuelPrice>>,
+    announce_unchanged: bool,
 ) {
     let Some(channel_id) = config
         .get()
@@ -140,6 +142,7 @@ async fn check_prices(
         .fuel_channel_id
         .map(ChannelId::new)
     else {
+        tracing::debug!("fuel tracker disabled: price_tracker.fuel_channel_id not set");
         return;
     };
 
@@ -152,7 +155,8 @@ async fn check_prices(
     };
 
     let current = to_snapshot(&prices);
-    if last.as_ref() == Some(&current) {
+    if !should_announce(last.as_ref(), &current, announce_unchanged) {
+        tracing::debug!("Fuel prices unchanged since the last announcement");
         return;
     }
 
@@ -176,9 +180,21 @@ pub async fn track_prices(
 ) {
     let client = reqwest::Client::new();
     let mut last = load_snapshot(&cache, CACHE_KEY).await;
+    let mut config_updates = config.subscribe();
+
+    tracing::info!("Running fuel price tracker startup check");
+    check_prices(&ctx, &config, &client, &cache, &mut last, false).await;
 
     loop {
-        check_prices(&ctx, &config, &client, &cache, &mut last).await;
-        wait_for_next_check("fuel").await;
+        let trigger = wait_for_next_check("fuel", &mut config_updates).await;
+        check_prices(
+            &ctx,
+            &config,
+            &client,
+            &cache,
+            &mut last,
+            trigger == CheckTrigger::Scheduled,
+        )
+        .await;
     }
 }

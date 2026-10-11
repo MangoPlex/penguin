@@ -6,6 +6,7 @@ use std::{
 };
 
 use serde::Deserialize;
+use tokio::sync::watch;
 
 use crate::Result;
 
@@ -40,6 +41,7 @@ impl AppConfig {
 pub struct SharedConfig {
     path: PathBuf,
     inner: RwLock<AppConfig>,
+    updates: watch::Sender<()>,
 }
 
 impl SharedConfig {
@@ -50,10 +52,12 @@ impl SharedConfig {
             tracing::warn!("Failed to load config from {:?}: {}", path, e);
             AppConfig::default()
         });
+        let (updates, _) = watch::channel(());
 
         Arc::new(Self {
             path,
             inner: RwLock::new(config),
+            updates,
         })
     }
 
@@ -61,10 +65,16 @@ impl SharedConfig {
         self.inner.read().unwrap().clone()
     }
 
+    /// Receives a notification after each successful configuration reload.
+    pub fn subscribe(&self) -> watch::Receiver<()> {
+        self.updates.subscribe()
+    }
+
     fn reload(&self) {
         match AppConfig::load(&self.path) {
             Ok(config) => {
                 *self.inner.write().unwrap() = config;
+                self.updates.send_replace(());
                 tracing::info!("Reloaded config from {:?}", self.path);
             }
             Err(e) => {

@@ -7,7 +7,9 @@ use crate::{
     Result,
     cache::Cache,
     config::SharedConfig,
-    features::price_tracker::{load_snapshot, save_snapshot, wait_for_next_check},
+    features::price_tracker::{
+        load_snapshot, save_snapshot, snapshot_changed, wait_for_next_check,
+    },
     utils::text::{COLOR_NEUTRAL, format_change, format_vnd},
 };
 
@@ -128,8 +130,7 @@ pub async fn preview_embed() -> Result<CreateEmbed> {
     Ok(build_embed(&previous, &current))
 }
 
-/// Announces the current tiers when they differ from the last announced
-/// snapshot (or when there is none yet), then stores them as the new snapshot.
+/// Stores the first tariff snapshot silently, then announces only later changes.
 async fn check_tiers(
     ctx: &serenity::Context,
     config: &SharedConfig,
@@ -159,12 +160,18 @@ async fn check_tiers(
 
     let current: HashMap<u8, ElectricityTier> =
         tiers.iter().map(|tier| (tier.tier, tier.clone())).collect();
-    if last.as_ref() == Some(&current) {
+
+    let Some(previous) = last.as_ref() else {
+        tracing::info!("Stored initial electricity tariff snapshot without announcement");
+        save_snapshot(cache, CACHE_KEY, &current).await;
+        *last = Some(current);
+        return;
+    };
+
+    if !snapshot_changed(Some(previous), &current) {
+        tracing::debug!("Electricity prices unchanged since the last announcement");
         return;
     }
-
-    let empty = HashMap::new();
-    let previous = last.as_ref().unwrap_or(&empty);
 
     if let Err(e) = announce_snapshot(&ctx.http, channel_id, previous, &tiers).await {
         tracing::warn!("Failed to announce electricity price changes: {}", e);
@@ -182,9 +189,11 @@ pub async fn track_prices(
 ) {
     let client = reqwest::Client::new();
     let mut last = load_snapshot(&cache, CACHE_KEY).await;
+    let mut config_updates = config.subscribe();
 
+    tracing::info!("Running electricity price tracker startup check");
     loop {
         check_tiers(&ctx, &config, &client, &cache, &mut last).await;
-        wait_for_next_check("electricity").await;
+        wait_for_next_check("electricity", &mut config_updates).await;
     }
 }

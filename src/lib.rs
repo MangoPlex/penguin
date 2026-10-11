@@ -1,5 +1,8 @@
 use std::{
-    sync::Arc,
+    sync::{
+        Arc,
+        atomic::{AtomicBool, Ordering},
+    },
     time::{Duration, Instant},
 };
 
@@ -22,6 +25,7 @@ pub struct Data {
     pub start_time: Instant,
     pub config: Arc<SharedConfig>,
     pub cache: Option<Arc<Cache>>,
+    price_trackers_started: AtomicBool,
 }
 type Error = Box<dyn std::error::Error + Send + Sync>;
 pub type Context<'a> = poise::Context<'a, Data, Error>;
@@ -42,11 +46,15 @@ pub async fn setup() -> Client {
     task::spawn(config::watch(config.clone()));
 
     let cache = match optional_var("VALKEY_URL") {
-        Some(url) => Some(Arc::new(
-            Cache::connect(&url)
-                .await
-                .expect("failed to connect to Valkey"),
-        )),
+        Some(url) => match Cache::connect(&url).await {
+            Ok(cache) => Some(Arc::new(cache)),
+            Err(e) => {
+                tracing::warn!(
+                    "Failed to connect to Valkey; price tracker snapshots will not persist: {e}"
+                );
+                None
+            }
+        },
         None => None,
     };
 
@@ -79,6 +87,7 @@ pub async fn setup() -> Client {
                     start_time: Instant::now(),
                     config,
                     cache,
+                    price_trackers_started: AtomicBool::new(false),
                 })
             })
         })
@@ -111,6 +120,10 @@ async fn update_presence(ctx: Arc<serenity::Context>, start_time: Instant) {
     }
 }
 
+fn should_start_price_trackers(started: &AtomicBool) -> bool {
+    !started.swap(true, Ordering::AcqRel)
+}
+
 async fn event_handler(
     framework: poise::FrameworkContext<'_, Data, Error>,
     event: &serenity::FullEvent,
@@ -129,8 +142,12 @@ async fn event_handler(
                 update_presence(rctx, start_time).await;
             });
 
-            let rctx = Arc::new(ctx.clone());
-            features::price_tracker::spawn(&rctx, &data.config, &data.cache);
+            if should_start_price_trackers(&data.price_trackers_started) {
+                let rctx = Arc::new(ctx.clone());
+                features::price_tracker::spawn(&rctx, &data.config, &data.cache);
+            } else {
+                tracing::info!("Price trackers are already running");
+            }
         }
         serenity::FullEvent::Message { new_message } => {
             let mut message = new_message.clone();
@@ -141,4 +158,19 @@ async fn event_handler(
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use std::sync::atomic::AtomicBool;
+
+    use super::should_start_price_trackers;
+
+    #[test]
+    fn price_trackers_start_only_once() {
+        let started = AtomicBool::new(false);
+
+        assert!(should_start_price_trackers(&started));
+        assert!(!should_start_price_trackers(&started));
+    }
 }

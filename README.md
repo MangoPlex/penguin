@@ -50,8 +50,9 @@ tracker.
   checked once a week, Thursday 15:05 local time (UTC+7), right after the
   fixed weekly adjustment slot.
 
-Each posts a single embed with every item's new price and the change, only
-when a price actually changes.
+Fuel posts a weekly embed every Thursday, including each item's change since
+the prior check. Electricity stores its first successful response as a
+baseline, then posts only when a tariff changes.
 
 ### Price cache
 
@@ -61,10 +62,10 @@ store) instead of only in memory. This survives bot restarts, so a restart
 around the weekly fuel check doesn't lose the baseline needed to detect a
 change. Each snapshot is stored with a `last_updated` timestamp.
 
-On startup each tracker compares the current prices with the cached snapshot:
-if there is none, or it differs, an embed is posted and the cache is updated;
-if it matches, nothing is posted. Leave `VALKEY_URL` unset to keep the
-in-memory-only behavior (every restart then posts once).
+Fuel posts its first successful snapshot and every scheduled weekly result.
+Electricity uses its first successful snapshot as a silent baseline and posts
+only later changes. Leave `VALKEY_URL` unset to keep the snapshots in memory;
+restarting then creates a new baseline.
 
 ## Build locally
 
